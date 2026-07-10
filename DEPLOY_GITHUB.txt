@@ -1,0 +1,194 @@
+════════════════════════════════════════════════════════════════
+ GFA INVENTORY — GITHUB PAGES + APPS SCRIPT DEPLOYMENT GUIDE
+════════════════════════════════════════════════════════════════
+
+OVERVIEW
+--------
+The app has two parts:
+  1. GitHub Pages  — hosts the static app (HTML, icons, manifest, sw.js)
+  2. Google Apps Script — REST API that reads/writes data on Google Drive
+
+Both must be set up for the app to work.
+
+ESTIMATED TIME: ~20 minutes (one-time setup)
+
+════════════════════════════════════════════════════════════════
+PART 1 — DEPLOY THE APPS SCRIPT REST API
+════════════════════════════════════════════════════════════════
+
+Step 1 — Create the Apps Script project
+  1. Go to https://script.google.com
+  2. Click "New project"
+  3. Rename it to: GFA Inventory API
+
+Step 2 — Paste the server code
+  1. Open Code.gs from the gfa-app folder
+  2. Delete all existing code in the Apps Script editor
+  3. Paste the contents of Code.gs
+  4. Press Ctrl+S to save
+
+Step 3 — Deploy as a Web App
+  1. Click the blue "Deploy" button → "New deployment"
+  2. Click the gear icon ⚙ next to "Select type" → "Web app"
+  3. Settings:
+       - Execute as:      Me
+       - Who has access:  Anyone
+         (IMPORTANT: choose "Anyone" — not "Anyone with Google Account"
+          so it works from GitHub Pages without login prompts)
+  4. Click "Deploy"
+  5. Authorize access when prompted (click Advanced → Go to GFA Inventory API if needed)
+  6. COPY the Web App URL — it looks like:
+       https://script.google.com/macros/s/AKfycb.../exec
+
+Step 4 — Note the URL for Part 2
+
+════════════════════════════════════════════════════════════════
+PART 2 — UPDATE THE APP WITH YOUR API URL
+════════════════════════════════════════════════════════════════
+
+Step 5 — Set API_URL in index.html
+  1. Open gfa-app/index.html in a text editor (or ask Claude)
+  2. Find this line near the top of the <script> section:
+       const API_URL = '';
+  3. Replace it with your Apps Script URL:
+       const API_URL = 'https://script.google.com/macros/s/AKfycb.../exec';
+  4. Save the file
+
+════════════════════════════════════════════════════════════════
+PART 3 — PUSH TO GITHUB AND ENABLE PAGES
+════════════════════════════════════════════════════════════════
+
+Step 6 — Create a GitHub repository
+  1. Go to https://github.com/infogamefishingasia-ux
+  2. Click the green "New" button
+  3. Repository name: gfa-inventory
+  4. Set to: Public (required for free GitHub Pages)
+  5. Do NOT initialize with README
+  6. Click "Create repository"
+
+Step 7 — Upload files to GitHub
+  Option A — via GitHub web interface (easiest, no software needed):
+    1. Open your new repo on GitHub
+    2. Click "uploading an existing file" or drag-and-drop
+    3. Upload ALL files from the gfa-app folder:
+         index.html
+         manifest.json
+         sw.js
+         .nojekyll
+         icons/icon-192.png
+         icons/icon-512.png
+         icons/apple-touch-icon.png
+         icons/favicon.png
+       NOTE: The icons folder must be uploaded as a folder.
+       On GitHub, click "Add file" → "Upload files" → drag the whole gfa-app folder
+    4. Commit the upload
+
+  Option B — via Git command line (if you have Git installed):
+    cd path/to/gfa-app
+    git init
+    git add .
+    git commit -m "Initial GFA Inventory PWA"
+    git branch -M main
+    git remote add origin https://github.com/infogamefishingasia-ux/gfa-inventory.git
+    git push -u origin main
+
+Step 8 — Enable GitHub Pages
+  1. In your GitHub repo, go to Settings → Pages
+  2. Under "Source", select:
+       Branch: main
+       Folder: / (root)
+  3. Click Save
+  4. Wait 1–2 minutes
+  5. GitHub will show your site URL:
+       https://infogamefishingasia-ux.github.io/gfa-inventory/
+
+════════════════════════════════════════════════════════════════
+PART 4 — VERIFY AND SHARE
+════════════════════════════════════════════════════════════════
+
+Step 9 — Test the app
+  1. Open https://infogamefishingasia-ux.github.io/gfa-inventory/
+     in a browser (ideally an Incognito window)
+  2. The app should load and ask you to log in
+  3. Log in as Super Admin (password: GFASUPER2026)
+  4. Check that data loads and saves correctly
+
+Step 10 — Add to home screen (PWA install)
+  On iPhone/iPad:
+    1. Open the app URL in Safari
+    2. Tap the Share button (box with arrow)
+    3. Scroll down → "Add to Home Screen"
+    4. Name it "GFA Inventory" → Add
+
+  On Android:
+    1. Open the app URL in Chrome
+    2. Tap the menu (three dots) → "Add to Home Screen"
+    OR Chrome will show a banner — tap "Install"
+
+  On Desktop Chrome:
+    1. Open the URL
+    2. Look for the install icon (⊕) in the address bar → click it
+
+════════════════════════════════════════════════════════════════
+UPDATING THE APP IN FUTURE
+════════════════════════════════════════════════════════════════
+
+When the HTML is updated:
+  1. Replace the index.html in your GitHub repo
+     (GitHub web: go to the file → click pencil icon → paste → commit)
+     (Git: update file, git add index.html, git commit, git push)
+  2. Changes go live in ~1 minute
+
+When the Apps Script code changes (Code.gs):
+  1. Paste the new code into Apps Script editor
+  2. Deploy → Manage deployments → Edit → New version → Deploy
+  3. The URL stays the same — no need to update index.html
+
+════════════════════════════════════════════════════════════════
+DEFAULT PASSWORDS (change these after first login!)
+════════════════════════════════════════════════════════════════
+
+  Super Admin (Darran):  GFASUPER2026
+  Admin accounts:        Created by Super Admin in Settings → Admin Accounts
+  Staff accounts:        Created by any Admin in Settings → Staff Accounts
+
+════════════════════════════════════════════════════════════════
+FILE STRUCTURE IN gfa-app/
+════════════════════════════════════════════════════════════════
+
+  gfa-app/
+  ├── index.html          ← Main app (all HTML, CSS, JS in one file)
+  ├── manifest.json       ← PWA manifest (name, icons, theme color)
+  ├── sw.js               ← Service worker (offline support)
+  ├── .nojekyll           ← Tells GitHub Pages to skip Jekyll processing
+  ├── Code.gs             ← Apps Script REST API code (paste into Apps Script)
+  ├── DEPLOY_GITHUB.txt   ← This file
+  └── icons/
+      ├── icon-192.png    ← App icon (Android home screen)
+      ├── icon-512.png    ← App icon (splash screen)
+      ├── apple-touch-icon.png  ← App icon (iPhone home screen)
+      └── favicon.png     ← Browser tab icon
+
+════════════════════════════════════════════════════════════════
+TROUBLESHOOTING
+════════════════════════════════════════════════════════════════
+
+Problem: "Failed to Load Data" error after opening the app
+Solution: Make sure API_URL in index.html is set to your Apps Script URL.
+          Also make sure Apps Script is deployed with "Anyone" access.
+
+Problem: App loads but data doesn't save
+Solution: Re-deploy the Apps Script with "Manage deployments" → new version.
+          Check that FOLDER_ID in Code.gs matches your Drive folder.
+
+Problem: GitHub Pages shows 404
+Solution: Wait 2–3 minutes after enabling Pages.
+          Make sure index.html is in the root (not a subfolder).
+          Make sure .nojekyll is present.
+
+Problem: App shows old version on phone after update
+Solution: Hard-refresh the service worker:
+          Chrome desktop: DevTools → Application → Service Workers → Update
+          Phone: Close and reopen the browser, or clear site data.
+
+════════════════════════════════════════════════════════════════
