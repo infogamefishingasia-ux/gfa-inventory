@@ -1,0 +1,4928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#1B3A5C">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GFA Inventory">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icons/favicon.png">
+<title>GFA Inventory</title>
+<style>
+:root {
+  --navy:#1B3A5C; --teal:#0E7C7B; --gold:#D4A017; --red:#C0392B;
+  --orange:#E67E22; --green:#27AE60; --dark:#2C3E50; --light:#F4F6F9;
+  --border:#DDE1E7; --white:#fff; --radius:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--light);color:#333;min-height:100vh}
+
+/* ── TOP BAR ── */
+.topbar{background:var(--navy);display:flex;align-items:center;padding:14px 18px;gap:12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.topbar-logo{color:#fff;font-size:17px;font-weight:700;flex:1;letter-spacing:.3px}
+.topbar-sub{color:#8DB4D8;font-size:11px;display:block;font-weight:400}
+.btn-admin{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25);
+  padding:7px 14px;border-radius:20px;cursor:pointer;font-size:12px;font-weight:600;transition:all .2s}
+.btn-admin:hover{background:rgba(255,255,255,.22)}
+.btn-admin.active{background:var(--gold);border-color:var(--gold);color:var(--dark)}
+
+/* ── STAFF HOME ── */
+.staff-home{padding:20px 16px}
+.welcome-banner{background:linear-gradient(135deg,var(--teal),#1A9A99);border-radius:var(--radius);
+  padding:18px;color:#fff;margin-bottom:20px}
+.welcome-banner h2{font-size:18px;margin-bottom:4px}
+.welcome-banner p{font-size:13px;opacity:.85}
+.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.cat-card{background:var(--white);border-radius:var(--radius);padding:20px 16px;
+  text-align:center;cursor:pointer;border:2px solid transparent;
+  box-shadow:0 2px 8px rgba(0,0,0,.06);transition:all .18s;-webkit-tap-highlight-color:transparent}
+.cat-card:hover,.cat-card:active{border-color:var(--teal);transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.12)}
+.cat-icon{font-size:36px;margin-bottom:10px}
+.cat-name{font-size:14px;font-weight:700;color:var(--dark)}
+.cat-count{font-size:11px;color:#888;margin-top:3px}
+
+/* ── SECTION VIEWS ── */
+.section-view{display:none;flex-direction:column;height:calc(100vh - 56px)}
+.section-view.active{display:flex}
+.section-header{background:var(--navy);padding:14px 18px;display:flex;align-items:center;gap:10px}
+.section-header.teal{background:var(--teal)}
+.section-header.dark{background:var(--dark)}
+.section-header.gold{background:#B7860E}
+.section-header.red{background:var(--red)}
+.btn-back{background:none;border:none;color:#fff;font-size:22px;cursor:pointer;padding:0 4px;line-height:1}
+.section-title{color:#fff;font-size:15px;font-weight:700;flex:1}
+.section-body{flex:1;overflow-y:auto;padding:16px}
+
+/* ── FORMS ── */
+.card{background:var(--white);border-radius:var(--radius);padding:18px;
+  margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.card-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:14px;
+  text-transform:uppercase;letter-spacing:.4px}
+.form-group{margin-bottom:14px}
+label{display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:5px;text-transform:uppercase;letter-spacing:.3px}
+input[type=text],input[type=number],input[type=date],input[type=password],select,textarea{
+  width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:7px;
+  font-size:14px;background:#fff;color:#333;outline:none;transition:border-color .2s;
+  -webkit-appearance:none;appearance:none}
+input:focus,select:focus,textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(14,124,123,.1)}
+textarea{min-height:80px;resize:vertical}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23555' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+.search-input{position:relative}
+.search-input input{padding-left:32px}
+.search-input::before{content:"🔍";position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;z-index:1}
+
+/* ── BUTTONS ── */
+.btn{width:100%;padding:14px;border:none;border-radius:8px;font-size:15px;
+  font-weight:700;cursor:pointer;transition:all .18s;letter-spacing:.3px}
+.btn-primary{background:var(--teal);color:#fff}
+.btn-primary:hover{background:#0a6a6a}
+.btn-primary:active{transform:scale(.98)}
+.btn-danger{background:var(--red);color:#fff}
+.btn-danger:hover{background:#a93226}
+.btn-success{background:var(--green);color:#fff}
+.btn-outline{background:#fff;color:var(--teal);border:2px solid var(--teal)}
+.btn-sm{width:auto;padding:6px 14px;font-size:12px;border-radius:6px}
+.btn-icon{background:none;border:none;cursor:pointer;padding:4px 8px;font-size:16px;border-radius:5px;transition:background .15s}
+.btn-icon:hover{background:#f0f0f0}
+
+/* ── HISTORY LIST ── */
+.history-item{background:#F8FAFC;border-radius:8px;padding:13px;margin-bottom:10px;
+  border-left:4px solid var(--teal);display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.history-item.pending{border-left-color:var(--orange)}
+.history-item.completed{border-left-color:var(--green)}
+.history-item.deleted{opacity:.45;text-decoration:line-through}
+.history-meta{font-size:11px;color:#999;margin-top:3px}
+.history-desc{font-size:13px;color:var(--dark);font-weight:500}
+.history-sub{font-size:12px;color:#666;margin-top:2px}
+
+/* ── STATUS BADGE ── */
+.badge{display:inline-block;padding:3px 9px;border-radius:12px;font-size:11px;font-weight:700}
+.badge-pending{background:#FEF3CD;color:#856404}
+.badge-completed{background:#D1F2EB;color:#0E6655}
+.badge-in-stock{background:#D1F2EB;color:#0E6655}
+.badge-oos{background:#FADBD8;color:var(--red)}
+
+/* ── TABS ── */
+.tab-bar{display:flex;background:#F0F4F8;border-radius:8px;padding:3px;margin-bottom:16px}
+.tab-btn{flex:1;padding:8px;border:none;background:none;border-radius:6px;
+  font-size:12px;font-weight:600;cursor:pointer;color:#666;transition:all .15s}
+.tab-btn.active{background:#fff;color:var(--navy);box-shadow:0 1px 4px rgba(0,0,0,.1)}
+
+/* ── ADMIN PANEL ── */
+#admin-panel{display:none}
+#admin-panel.active{display:block}
+.admin-wrap{padding:16px}
+.admin-section{background:#fff;border-radius:var(--radius);margin-bottom:20px;
+  box-shadow:0 2px 8px rgba(0,0,0,.06);overflow:hidden}
+.admin-section-hdr{background:var(--navy);color:#fff;padding:13px 18px;
+  display:flex;align-items:center;justify-content:space-between}
+.admin-section-hdr h3{font-size:14px;font-weight:700}
+.admin-table{width:100%;border-collapse:collapse;font-size:13px}
+.admin-table th{background:#F0F4F8;color:#555;font-size:11px;text-transform:uppercase;
+  letter-spacing:.4px;padding:10px 12px;text-align:left;border-bottom:2px solid var(--border)}
+.admin-table td{padding:10px 12px;border-bottom:1px solid #F5F5F5;vertical-align:middle}
+.admin-table tr:last-child td{border-bottom:none}
+.admin-table tr:hover td{background:#FAFBFD}
+
+/* ── LOGIN OVERLAY ── */
+.overlay{position:fixed;inset:0;background:rgba(27,58,92,.95);z-index:200;
+  display:flex;align-items:center;justify-content:center;padding:20px}
+.overlay.hidden{display:none}
+.login-card{background:#fff;border-radius:16px;padding:28px 24px;width:100%;max-width:380px;text-align:center}
+.login-card h2{color:var(--navy);font-size:20px;margin-bottom:4px}
+.login-card p{color:#888;font-size:13px;margin-bottom:18px}
+.login-err{color:var(--red);font-size:13px;margin-top:10px;display:none}
+/* Login tab switcher */
+.ltab-bar{display:flex;background:#F0F4F8;border-radius:8px;padding:3px;margin-bottom:20px}
+.ltab{flex:1;padding:10px;border:none;background:none;border-radius:6px;font-size:13px;
+  font-weight:600;cursor:pointer;color:#666;transition:all .15s}
+.ltab.active{background:#fff;color:var(--navy);box-shadow:0 1px 4px rgba(0,0,0,.12)}
+/* User badge in topbar */
+.user-badge{font-size:12px;font-weight:600;color:#fff;background:rgba(255,255,255,.18);
+  padding:5px 11px;border-radius:20px;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.user-badge .logout-btn{background:rgba(255,255,255,.25);border:none;color:#fff;
+  border-radius:12px;padding:2px 8px;font-size:11px;cursor:pointer;font-weight:700}
+.user-badge .logout-btn:hover{background:rgba(255,255,255,.4)}
+
+/* ── LOADING OVERLAY ── */
+#loading-overlay{position:fixed;inset:0;background:rgba(27,58,92,.97);z-index:300;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center}
+.spinner{width:52px;height:52px;border:4px solid rgba(255,255,255,.25);border-top-color:#D4A017;
+  border-radius:50%;animation:spin .8s linear infinite;margin-bottom:20px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
+  background:var(--dark);color:#fff;padding:12px 22px;border-radius:24px;
+  font-size:13px;font-weight:600;z-index:999;transition:transform .3s ease;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.success{background:var(--green)}
+.toast.error{background:var(--red)}
+
+/* ── MISC ── */
+.divider{border:none;border-top:1px solid var(--border);margin:14px 0}
+.empty-state{text-align:center;padding:30px 16px;color:#aaa}
+.empty-state .icon{font-size:40px;margin-bottom:10px}
+.tag{background:#EBF5FB;color:var(--navy);padding:3px 8px;border-radius:5px;font-size:11px}
+.inline-row{display:flex;gap:10px;align-items:flex-end}
+.inline-row .form-group{flex:1;margin-bottom:0}
+.radio-group{display:flex;gap:10px;flex-wrap:wrap}
+.radio-opt{flex:1;min-width:80px}
+.radio-opt input{display:none}
+.radio-opt label{display:block;text-align:center;padding:10px 8px;border:2px solid var(--border);
+  border-radius:7px;cursor:pointer;font-size:13px;font-weight:600;text-transform:none;letter-spacing:0;color:#555}
+.radio-opt input:checked + label{border-color:var(--teal);background:#E8F6F5;color:var(--teal)}
+.required{color:var(--red)}
+.qty-control{display:flex;align-items:center;gap:8px}
+.qty-control button{width:38px;height:38px;border:1.5px solid var(--border);background:#fff;
+  border-radius:7px;font-size:20px;cursor:pointer;line-height:1;font-weight:300}
+.qty-control input{width:70px;text-align:center}
+@media(max-width:400px){.cat-grid{grid-template-columns:1fr 1fr}}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+
+<!-- ── LOADING OVERLAY ── -->
+<div id="loading-overlay">
+  <div style="font-size:44px;margin-bottom:10px">🎣</div>
+  <div class="spinner"></div>
+  <div style="font-size:17px;font-weight:700;margin-bottom:6px">GFA / Aqua Creed</div>
+  <div style="font-size:13px;opacity:.7">Loading inventory data from Google Drive…</div>
+</div>
+
+<!-- ── APP LOGIN OVERLAY ── -->
+<div class="overlay" id="login-overlay">
+  <div class="login-card">
+    <div style="font-size:38px;margin-bottom:6px">🎣</div>
+    <h2>GFA / Aqua Creed</h2>
+    <p>Inventory Management System</p>
+
+    <!-- Tab switcher -->
+    <div class="ltab-bar">
+      <button class="ltab active" id="ltab-staff" onclick="switchLoginTab('staff')">👤 Staff Login</button>
+      <button class="ltab" id="ltab-admin" onclick="switchLoginTab('admin')">⚙️ Admin Login</button>
+    </div>
+
+    <!-- STAFF LOGIN -->
+    <div id="lsec-staff">
+      <div class="form-group" style="text-align:left">
+        <label style="font-size:12px;font-weight:600;color:#555">Select Your Name</label>
+        <select id="staff-login-name" style="width:100%;padding:10px;border:1.5px solid #ccc;border-radius:8px;font-size:14px;margin-top:4px">
+          <option value="">— Choose name —</option>
+        </select>
+      </div>
+      <div class="form-group" style="text-align:left">
+        <label style="font-size:12px;font-weight:600;color:#555">Password</label>
+        <input type="password" id="staff-login-pw" placeholder="Enter your password"
+          style="margin-top:4px" onkeydown="if(event.key==='Enter')doStaffLogin()">
+      </div>
+      <button class="btn btn-primary" style="width:100%" onclick="doStaffLogin()">Sign In</button>
+      <div class="login-err" id="staff-login-err">Incorrect name or password.</div>
+    </div>
+
+    <!-- ADMIN LOGIN -->
+    <div id="lsec-admin" style="display:none">
+      <div class="form-group" style="text-align:left">
+        <label style="font-size:12px;font-weight:600;color:#555">Login As</label>
+        <select id="admin-login-who" style="width:100%;padding:10px;border:1.5px solid #ccc;border-radius:8px;font-size:14px;margin-top:4px">
+          <option value="">— Choose account —</option>
+          <option value="__superadmin__">🔑 Super Admin (Darran)</option>
+        </select>
+      </div>
+      <div class="form-group" style="text-align:left">
+        <label style="font-size:12px;font-weight:600;color:#555">Password</label>
+        <input type="password" id="admin-pw-input" placeholder="Enter password"
+          style="margin-top:4px" onkeydown="if(event.key==='Enter')doAdminLogin()">
+      </div>
+      <button class="btn btn-primary" style="width:100%" onclick="doAdminLogin()">Unlock Admin Panel</button>
+      <div class="login-err" id="admin-login-err">Incorrect password. Try again.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOP BAR ── -->
+<div class="topbar">
+  <div class="topbar-logo">
+    GFA / Aqua Creed
+    <span class="topbar-sub">Inventory Management</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <div class="user-badge" id="user-badge" style="display:none">
+      <span id="user-badge-name"></span>
+      <button class="logout-btn" onclick="doLogout()">Logout</button>
+    </div>
+    <button class="btn-admin" id="admin-toggle-btn" onclick="toggleAdmin()" style="display:none">⚙️ Admin</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     STAFF INTERFACE
+══════════════════════════════════════════ -->
+<div id="staff-interface" style="display:none">
+
+<!-- HOME -->
+<div id="view-home" class="staff-home">
+  <div class="welcome-banner">
+    <h2>👋 What would you like to update?</h2>
+    <p>Tap a category below to log an update or record a change.</p>
+  </div>
+  <div class="cat-grid">
+    <div class="cat-card" onclick="showSection('maintenance')">
+      <div class="cat-icon">🔧</div>
+      <div class="cat-name">Maintenance</div>
+      <div class="cat-count" id="maint-count">Loading…</div>
+    </div>
+    <div class="cat-card" onclick="showSection('spareparts')">
+      <div class="cat-icon">⚙️</div>
+      <div class="cat-name">Spare Parts</div>
+      <div class="cat-count" id="sp-count">Loading…</div>
+    </div>
+    <div class="cat-card" onclick="showSection('guesthouse')">
+      <div class="cat-icon">🏠</div>
+      <div class="cat-name">Guest House</div>
+      <div class="cat-count" id="gh-count">Loading…</div>
+    </div>
+    <div class="cat-card" onclick="showSection('tackle')">
+      <div class="cat-icon">🎣</div>
+      <div class="cat-name">Tackle & Merch</div>
+      <div class="cat-count" id="tk-count">Loading…</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── MAINTENANCE ── -->
+<div id="section-maintenance" class="section-view">
+  <div class="section-header teal">
+    <button class="btn-back" onclick="goHome()">‹</button>
+    <span class="section-title">🔧 Maintenance Log</span>
+  </div>
+  <div class="section-body">
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchTab('maint','log')">➕ Log Entry</button>
+      <button class="tab-btn" onclick="switchTab('maint','pending')">⏳ Pending</button>
+      <button class="tab-btn" onclick="switchTab('maint','history')">📋 History</button>
+    </div>
+
+    <!-- Log Entry -->
+    <div id="maint-tab-log">
+      <div class="card">
+        <div class="card-title">New Maintenance Entry</div>
+        <div class="form-group">
+          <label>Asset / Boat <span class="required">*</span></label>
+          <select id="maint-asset"></select>
+        </div>
+        <div class="form-group">
+          <label>Description <span class="required">*</span></label>
+          <textarea id="maint-desc" placeholder="Describe the work done or required…" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <div class="radio-group">
+            <div class="radio-opt"><input type="radio" name="maint-status" id="ms-completed" value="COMPLETED" checked><label for="ms-completed">✅ Completed</label></div>
+            <div class="radio-opt"><input type="radio" name="maint-status" id="ms-pending" value="PENDING"><label for="ms-pending">⏳ Pending</label></div>
+            <div class="radio-opt"><input type="radio" name="maint-status" id="ms-inprogress" value="IN PROGRESS"><label for="ms-inprogress">🔄 In Progress</label></div>
+          </div>
+        </div>
+        <div class="inline-row">
+          <div class="form-group">
+            <label>Date</label>
+            <input type="date" id="maint-date">
+          </div>
+          <div class="form-group">
+            <label>Engine Hrs Port</label>
+            <input type="number" id="maint-port" placeholder="e.g. 355">
+          </div>
+          <div class="form-group">
+            <label>Engine Hrs Stbd</label>
+            <input type="number" id="maint-stbd" placeholder="e.g. 342">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Done By / Remarks</label>
+          <input type="text" id="maint-remarks" placeholder="Name of engineer or extra notes">
+        </div>
+        <button class="btn btn-primary" onclick="submitMaint()">✅ Save Entry</button>
+      </div>
+    </div>
+
+    <!-- Pending -->
+    <div id="maint-tab-pending" style="display:none">
+      <div id="maint-pending-list"></div>
+    </div>
+
+    <!-- History -->
+    <div id="maint-tab-history" style="display:none">
+      <div class="form-group">
+        <select id="maint-filter-asset" onchange="renderMaintHistory()">
+          <option value="">All Assets</option>
+        </select>
+      </div>
+      <div id="maint-history-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SPARE PARTS ── -->
+<div id="section-spareparts" class="section-view">
+  <div class="section-header dark">
+    <button class="btn-back" onclick="goHome()">‹</button>
+    <span class="section-title">⚙️ Spare Parts</span>
+  </div>
+  <div class="section-body">
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchTab('sp','issue')">📤 Issue Part</button>
+      <button class="tab-btn" onclick="switchTab('sp','receive')">📥 Receive Stock</button>
+      <button class="tab-btn" onclick="switchTab('sp','list')">📋 All Parts</button>
+    </div>
+
+    <!-- Issue -->
+    <div id="sp-tab-issue">
+      <div class="card">
+        <div class="card-title">Issue a Spare Part</div>
+        <div class="form-group search-input">
+          <label>Search Part</label>
+          <input type="text" id="sp-issue-search" placeholder="Type part number or description…" oninput="filterPartDropdown('issue')">
+        </div>
+        <div class="form-group">
+          <label>Select Part <span class="required">*</span></label>
+          <select id="sp-issue-select" onchange="updatePartBalance('issue')"></select>
+        </div>
+        <div class="form-group">
+          <label>Current Balance</label>
+          <div id="sp-issue-balance" style="padding:10px;background:#F8FAFC;border-radius:7px;font-size:14px;font-weight:600;color:var(--dark)">—</div>
+        </div>
+        <div class="form-group">
+          <label>Qty to Issue <span class="required">*</span></label>
+          <div class="qty-control">
+            <button onclick="adjustQty('sp-issue-qty',-1)">−</button>
+            <input type="number" id="sp-issue-qty" value="1" min="1">
+            <button onclick="adjustQty('sp-issue-qty',1)">+</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Issued To / Remarks</label>
+          <input type="text" id="sp-issue-remarks" placeholder="Which boat or engineer">
+        </div>
+        <button class="btn btn-primary" onclick="submitSpIssue()">📤 Confirm Issue</button>
+      </div>
+    </div>
+
+    <!-- Receive -->
+    <div id="sp-tab-receive" style="display:none">
+      <div class="card">
+        <div class="card-title">Receive New Stock</div>
+        <div class="form-group search-input">
+          <label>Search Part</label>
+          <input type="text" id="sp-recv-search" placeholder="Type part number or description…" oninput="filterPartDropdown('recv')">
+        </div>
+        <div class="form-group">
+          <label>Select Part <span class="required">*</span></label>
+          <select id="sp-recv-select" onchange="updatePartBalance('recv')"></select>
+        </div>
+        <div class="form-group">
+          <label>Current Balance</label>
+          <div id="sp-recv-balance" style="padding:10px;background:#F8FAFC;border-radius:7px;font-size:14px;font-weight:600;color:var(--dark)">—</div>
+        </div>
+        <div class="form-group">
+          <label>Qty Received <span class="required">*</span></label>
+          <div class="qty-control">
+            <button onclick="adjustQty('sp-recv-qty',-1)">−</button>
+            <input type="number" id="sp-recv-qty" value="1" min="1">
+            <button onclick="adjustQty('sp-recv-qty',1)">+</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Supplier / Invoice Ref</label>
+          <input type="text" id="sp-recv-remarks" placeholder="Supplier name or invoice number">
+        </div>
+        <button class="btn btn-success" onclick="submitSpReceive()">📥 Confirm Receipt</button>
+      </div>
+    </div>
+
+    <!-- Parts List -->
+    <div id="sp-tab-list" style="display:none">
+      <div class="form-group search-input" style="margin-bottom:12px">
+        <input type="text" id="sp-list-search" placeholder="Filter by part number or category…" oninput="renderPartsList()" style="padding-left:32px">
+      </div>
+      <div id="sp-parts-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── GUEST HOUSE ── -->
+<div id="section-guesthouse" class="section-view">
+  <div class="section-header gold">
+    <button class="btn-back" onclick="goHome()">‹</button>
+    <span class="section-title">🏠 Guest House Inventory</span>
+  </div>
+  <div class="section-body">
+    <div class="tab-bar" id="gh-tab-bar">
+      <button class="tab-btn active" onclick="switchGHTab('Linen')">🛏️ Linen</button>
+      <button class="tab-btn" onclick="switchGHTab('Cutlery')">🍴 Cutlery</button>
+      <button class="tab-btn" onclick="switchGHTab('Crockery')">🍽️ Crockery</button>
+      <button class="tab-btn" onclick="switchGHTab('Kitchen Equipment')">🍳 Kitchen Equipment</button>
+      <button class="tab-btn" onclick="switchGHTab('House Keeping')">🧹 House Keeping</button>
+    </div>
+    <div id="gh-category-body"></div>
+  </div>
+</div>
+
+
+<!-- ── TACKLE ── -->
+<div id="section-tackle" class="section-view">
+  <div class="section-header" style="background:#117A65">
+    <button class="btn-back" onclick="goHome()">‹</button>
+    <span class="section-title">🎣 Tackle & Merchandise</span>
+  </div>
+  <div class="section-body">
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchTab('tk','update')">✏️ Update Qty</button>
+      <button class="tab-btn" onclick="switchTab('tk','list')">📋 All Items</button>
+    </div>
+    <div id="tk-tab-update">
+      <div class="card">
+        <div class="card-title">Update Item Quantity</div>
+        <div class="form-group">
+          <label>Category</label>
+          <select id="tk-cat-select" onchange="filterTackleItems()"></select>
+        </div>
+        <div class="form-group">
+          <label>Item <span class="required">*</span></label>
+          <select id="tk-item-select" onchange="loadTackleQty()"></select>
+        </div>
+        <div class="form-group">
+          <label>Current Qty on Record</label>
+          <div id="tk-current-qty" style="padding:10px;background:#F8FAFC;border-radius:7px;font-size:14px;font-weight:600">—</div>
+        </div>
+        <div class="form-group">
+          <label>New Quantity <span class="required">*</span></label>
+          <div class="qty-control">
+            <button onclick="adjustQty('tk-new-qty',-1)">−</button>
+            <input type="number" id="tk-new-qty" value="0" min="0">
+            <button onclick="adjustQty('tk-new-qty',1)">+</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Notes</label>
+          <input type="text" id="tk-notes" placeholder="Any notes about this count">
+        </div>
+        <button class="btn btn-primary" onclick="submitTackle()">✅ Update Quantity</button>
+      </div>
+    </div>
+    <div id="tk-tab-list" style="display:none">
+      <div id="tk-items-list"></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /staff-interface -->
+
+<!-- ══════════════════════════════════════════
+     ADMIN PANEL
+══════════════════════════════════════════ -->
+<div id="admin-panel">
+<div class="admin-wrap">
+
+  <!-- Admin nav -->
+  <div style="display:flex;gap:8px;margin-bottom:18px;overflow-x:auto;padding-bottom:4px">
+    <button class="btn btn-outline btn-sm admin-nav active" onclick="showAdminTab('updates')">📋 All Updates</button>
+    <button class="btn btn-outline btn-sm admin-nav" onclick="showAdminTab('assets')">🏗️ Assets</button>
+    <button class="btn btn-outline btn-sm admin-nav" onclick="showAdminTab('parts')">⚙️ Spare Parts</button>
+    <button class="btn btn-outline btn-sm admin-nav" onclick="showAdminTab('gh')">🏠 Guest House</button>
+    <button class="btn btn-outline btn-sm admin-nav" onclick="showAdminTab('tackle')">🎣 Tackle</button>
+    <button class="btn btn-outline btn-sm admin-nav" onclick="showAdminTab('settings')">⚙️ Settings</button>
+  </div>
+
+  <!-- ALL UPDATES -->
+  <div id="admin-tab-updates" class="admin-section">
+    <div class="admin-section-hdr">
+      <h3>📋 All Staff Updates</h3>
+      <button class="btn btn-success btn-sm" onclick="exportCSV()">⬇️ Export CSV</button>
+    </div>
+    <div style="padding:12px">
+      <div class="inline-row" style="margin-bottom:12px">
+        <div class="form-group">
+          <select id="admin-filter-type" onchange="renderAdminUpdates()">
+            <option value="">All Categories</option>
+            <option value="maintenance">Maintenance</option>
+            <option value="spareparts">Spare Parts</option>
+            <option value="guesthouse">Guest House</option>
+            <option value="tackle">Tackle</option>
+          </select>
+        </div>
+      </div>
+      <div id="admin-updates-list"></div>
+    </div>
+  </div>
+
+  <!-- ASSETS ADMIN -->
+  <div id="admin-tab-assets" class="admin-section" style="display:none">
+    <div class="admin-section-hdr">
+      <h3>🏗️ Manage Assets</h3>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btn-outline btn-sm" onclick="exportAssetsCSV()" title="Download CSV">⬇️ CSV</button>
+        <button class="btn btn-outline btn-sm" onclick="exportAssetsXLSX()" title="Download Excel">⬇️ Excel</button>
+        <label class="btn btn-outline btn-sm" style="cursor:pointer;margin:0" title="Import CSV (merge)">
+          ⬆️ Import CSV<input type="file" accept=".csv" style="display:none" onchange="importAssetsCSV(this)">
+        </label>
+      </div>
+    </div>
+    <div style="padding:14px">
+      <!-- Add-asset form — 2-row grid -->
+      <div style="background:#f7f9fc;border:1px solid #e0e6ef;border-radius:10px;padding:14px 14px 10px;margin-bottom:16px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+          <div>
+            <label style="font-size:11px;font-weight:600;color:#555;display:block;margin-bottom:3px">Asset Name *</label>
+            <input type="text" id="new-asset-name" placeholder="e.g. REEF RAIDER"
+              style="width:100%;padding:8px 10px;border:1.5px solid #ccc;border-radius:7px;font-size:13px;box-sizing:border-box">
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:600;color:#555;display:block;margin-bottom:3px">Category *</label>
+            <select id="new-asset-cat" style="width:100%;padding:8px 10px;border:1.5px solid #ccc;border-radius:7px;font-size:13px;box-sizing:border-box">
+              <option value="">— Select Category —</option>
+              <option>Boat &amp; Fishing Equipment</option>
+              <option>Computers</option>
+              <option>Refrigerator/Freezer</option>
+              <option>Kitchen Equipment</option>
+              <option>Office Equipment</option>
+              <option>Tools</option>
+              <option>Furniture &amp; Fixtures</option>
+              <option>Vehicles</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:600;color:#555;display:block;margin-bottom:3px">Purchase Date</label>
+            <input type="date" id="new-asset-pdate"
+              style="width:100%;padding:8px 10px;border:1.5px solid #ccc;border-radius:7px;font-size:13px;box-sizing:border-box">
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:600;color:#555;display:block;margin-bottom:3px">Purchase Price (₹)</label>
+            <input type="number" id="new-asset-pprice" placeholder="0" min="0"
+              style="width:100%;padding:8px 10px;border:1.5px solid #ccc;border-radius:7px;font-size:13px;box-sizing:border-box">
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:600;color:#555;display:block;margin-bottom:3px">Removed Date</label>
+            <input type="date" id="new-asset-rdate"
+              style="width:100%;padding:8px 10px;border:1.5px solid #ccc;border-radius:7px;font-size:13px;box-sizing:border-box">
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:600;color:#555;display:block;margin-bottom:3px">Reason for Removal</label>
+            <select id="new-asset-reason" style="width:100%;padding:8px 10px;border:1.5px solid #ccc;border-radius:7px;font-size:13px;box-sizing:border-box">
+              <option value="">— Select if removed —</option>
+              <option>Sold</option>
+              <option>Scrapped</option>
+              <option>Broken</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="addAsset()" style="width:100%;margin-top:4px">+ Add Asset</button>
+      </div>
+      <!-- Table (scrollable for wide screens) -->
+      <div style="overflow-x:auto">
+        <table class="admin-table" id="assets-table" style="min-width:700px">
+          <thead><tr>
+            <th style="width:28px">#</th>
+            <th>Asset Name</th>
+            <th>Category</th>
+            <th>Purchase Date</th>
+            <th>Price (₹)</th>
+            <th>Removed Date</th>
+            <th>Reason</th>
+            <th>Actions</th>
+          </tr></thead>
+          <tbody id="assets-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- SPARE PARTS ADMIN -->
+  <div id="admin-tab-parts" class="admin-section" style="display:none">
+    <div class="admin-section-hdr">
+      <h3>⚙️ Manage Spare Parts</h3>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btn-outline btn-sm" onclick="exportPartsCSV()" title="Download CSV">⬇️ CSV</button>
+        <button class="btn btn-outline btn-sm" onclick="exportPartsXLSX()" title="Download Excel">⬇️ Excel</button>
+        <label class="btn btn-outline btn-sm" style="cursor:pointer;margin:0" title="Import CSV (merge)">
+          ⬆️ Import CSV<input type="file" accept=".csv" style="display:none" onchange="importPartsCSV(this)">
+        </label>
+      </div>
+    </div>
+    <div style="padding:14px">
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-title">Add New Part</div>
+        <div class="inline-row">
+          <div class="form-group"><label>Part Number</label><input type="text" id="new-part-pn" placeholder="e.g. 6E5-11325-00"></div>
+          <div class="form-group">
+            <label>Select One</label>
+            <select id="new-part-boat" style="width:100%;padding:9px 10px;border:1.5px solid #ccc;border-radius:8px;font-size:13px">
+              <option value="">— Select Category —</option>
+              <option>Yamaha F250/F200 BET</option>
+              <option>Yamaha F250GET</option>
+              <option>Suzuki 200HP</option>
+              <option>Suzuki 250HP</option>
+              <option>Other Boat Spares</option>
+              <option>Fishing Equipment Spares</option>
+            </select>
+          </div>
+        </div>
+        <div class="inline-row">
+          <div class="form-group"><label>Unit</label><input type="text" id="new-part-unit" placeholder="PCS" value="PCS"></div>
+          <div class="form-group"><label>Opening Balance</label><input type="number" id="new-part-bal" placeholder="0" value="0" min="0"></div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="addPart()" style="width:auto;padding:10px 20px">+ Add Part</button>
+      </div>
+      <div class="form-group search-input">
+        <input type="text" id="admin-parts-search" placeholder="Search parts…" oninput="renderAdminParts()" style="padding-left:32px">
+      </div>
+      <div style="overflow-x:auto">
+        <table class="admin-table">
+          <thead><tr><th>Part No.</th><th>Category</th><th>Unit</th><th>Balance</th><th></th></tr></thead>
+          <tbody id="admin-parts-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- GUEST HOUSE ADMIN -->
+  <div id="admin-tab-gh" class="admin-section" style="display:none">
+    <div class="admin-section-hdr">
+      <h3>🏠 Manage Guest House Items</h3>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btn-outline btn-sm" onclick="exportGHCSV()" title="Download CSV">⬇️ CSV</button>
+        <button class="btn btn-outline btn-sm" onclick="exportGHXLSX()" title="Download Excel">⬇️ Excel</button>
+        <label class="btn btn-outline btn-sm" style="cursor:pointer;margin:0" title="Import CSV (merge)">
+          ⬆️ Import CSV<input type="file" accept=".csv" style="display:none" onchange="importGHCSV(this)">
+        </label>
+      </div>
+    </div>
+    <div style="padding:14px">
+      <!-- category tabs -->
+      <div class="tab-bar" id="admin-gh-tab-bar">
+        <button class="tab-btn active" onclick="switchAdminGHTab('Linen')">🛏️ Linen</button>
+        <button class="tab-btn" onclick="switchAdminGHTab('Cutlery')">🍴 Cutlery</button>
+        <button class="tab-btn" onclick="switchAdminGHTab('Crockery')">🍽️ Crockery</button>
+        <button class="tab-btn" onclick="switchAdminGHTab('Kitchen Equipment')">🍳 Kitchen Equipment</button>
+        <button class="tab-btn" onclick="switchAdminGHTab('House Keeping')">🧹 House Keeping</button>
+      </div>
+      <!-- Add new item card -->
+      <div class="card" style="margin-bottom:14px" id="admin-gh-add-card">
+        <div class="card-title" id="admin-gh-add-title">Add Item to Linen</div>
+        <div class="inline-row">
+          <div class="form-group" style="flex:2">
+            <label>Item Name</label>
+            <input type="text" id="admin-gh-new-name" placeholder="e.g. BATH ROBE">
+          </div>
+          <div class="form-group">
+            <label>Qty</label>
+            <input type="number" id="admin-gh-new-qty" value="0" min="0" style="width:80px">
+          </div>
+          <div class="form-group">
+            <label>Price (₹)</label>
+            <input type="number" id="admin-gh-new-price" value="0" min="0" style="width:90px">
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="addGHItem()" style="white-space:nowrap;margin-top:20px">+ Add</button>
+        </div>
+      </div>
+      <!-- Table -->
+      <div style="overflow-x:auto">
+        <table class="admin-table" id="admin-gh-table">
+          <thead><tr><th>Item Name</th><th>Qty</th><th>Price (₹)</th><th>Actions</th></tr></thead>
+          <tbody id="admin-gh-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- TACKLE ADMIN -->
+  <div id="admin-tab-tackle" class="admin-section" style="display:none">
+    <div class="admin-section-hdr">
+      <h3>🎣 Manage Tackle & Merchandise</h3>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btn-outline btn-sm" onclick="exportTackleCSV()" title="Download CSV">⬇️ CSV</button>
+        <button class="btn btn-outline btn-sm" onclick="exportTackleXLSX()" title="Download Excel">⬇️ Excel</button>
+        <label class="btn btn-outline btn-sm" style="cursor:pointer;margin:0" title="Import CSV (merge)">
+          ⬆️ Import CSV<input type="file" accept=".csv" style="display:none" onchange="importTackleCSV(this)">
+        </label>
+      </div>
+    </div>
+    <div style="padding:14px">
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-title">Add New Item</div>
+        <div class="inline-row">
+          <div class="form-group">
+            <label>Category</label>
+            <select id="new-tk-cat"></select>
+          </div>
+          <div class="form-group">
+            <label>Item Description</label>
+            <input type="text" id="new-tk-desc" placeholder="Item name">
+          </div>
+        </div>
+        <div class="inline-row">
+          <div class="form-group"><label>Qty</label><input type="number" id="new-tk-qty" value="0" min="0"></div>
+          <div class="form-group"><label>Purchase Price (₹)</label><input type="number" id="new-tk-price" value="0" min="0" oninput="previewTkSalesPrice()"></div>
+          <div class="form-group"><label>Markup %</label><input type="number" id="new-tk-markup" value="0" placeholder="e.g. 20 or -10" oninput="previewTkSalesPrice()"></div>
+          <div class="form-group">
+            <label>Sales Price (₹)</label>
+            <div id="new-tk-sales-preview" style="padding:10px 13px;background:#E8F6F5;border-radius:7px;font-size:15px;font-weight:700;color:var(--teal);min-width:80px">0</div>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="addTackleItem()" style="width:auto;padding:10px 20px">+ Add Item</button>
+      </div>
+      <div class="form-group search-input">
+        <input type="text" id="admin-tk-search" placeholder="Filter tackle items…" oninput="renderAdminTackle()" style="padding-left:32px">
+      </div>
+      <div style="overflow-x:auto">
+        <table class="admin-table">
+          <thead><tr><th>Category</th><th>Description</th><th>Qty</th><th>Purchase Price (₹)</th><th>Markup %</th><th>Sales Price (₹)</th><th></th></tr></thead>
+          <tbody id="admin-tk-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div id="admin-tab-settings" class="admin-section" style="display:none">
+    <div class="admin-section-hdr"><h3>⚙️ Settings</h3></div>
+    <div style="padding:18px;max-width:400px">
+      <!-- Change Password -->
+      <div class="card">
+        <div class="card-title" id="pw-card-title">Change My Password</div>
+        <div class="form-group"><label>Current Password</label><input type="password" id="pw-current" placeholder="Current password"></div>
+        <div class="form-group"><label>New Password</label><input type="password" id="pw-new" placeholder="New password"></div>
+        <div class="form-group"><label>Confirm New</label><input type="password" id="pw-confirm" placeholder="Confirm new password"></div>
+        <button class="btn btn-primary" onclick="changePassword()">🔑 Update Password</button>
+      </div>
+      <!-- Admin Accounts — Super Admin only -->
+      <div class="card" style="margin-top:16px;display:none" id="admin-accounts-card">
+        <div class="card-title">🔐 Admin Accounts</div>
+        <p style="font-size:13px;color:#666;margin-bottom:14px">Add or remove manager admin accounts.</p>
+        <div class="inline-row" style="margin-bottom:12px;flex-wrap:wrap;gap:8px">
+          <div class="form-group" style="flex:2;min-width:120px;margin-bottom:0">
+            <input type="text" id="new-admin-name" placeholder="Full name e.g. Jane Manager" style="width:100%">
+          </div>
+          <div class="form-group" style="flex:2;min-width:120px;margin-bottom:0">
+            <input type="password" id="new-admin-pw" placeholder="Password" style="width:100%">
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="addAdminAccount()" style="white-space:nowrap">+ Add Admin</button>
+        </div>
+        <div id="admin-accounts-list"></div>
+      </div>
+      <!-- Staff Accounts -->
+      <div class="card" style="margin-top:16px">
+        <div class="card-title">👤 Staff Accounts</div>
+        <p style="font-size:13px;color:#666;margin-bottom:14px">Add or remove staff login accounts.</p>
+        <div class="inline-row" style="margin-bottom:12px;flex-wrap:wrap;gap:8px">
+          <div class="form-group" style="flex:2;min-width:120px;margin-bottom:0">
+            <input type="text" id="new-staff-name" placeholder="Full name e.g. John Smith" style="width:100%">
+          </div>
+          <div class="form-group" style="flex:2;min-width:120px;margin-bottom:0">
+            <input type="password" id="new-staff-pw" placeholder="Password" style="width:100%">
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="addStaffUser()" style="white-space:nowrap">+ Add Staff</button>
+        </div>
+        <div id="staff-users-list"></div>
+      </div>
+      <!-- Data Management -->
+      <div class="card" style="margin-top:16px">
+        <div class="card-title">Data Management</div>
+        <p style="font-size:13px;color:#666;margin-bottom:14px">Export all data or reset to original inventory snapshot.</p>
+        <button class="btn btn-outline" style="margin-bottom:10px" onclick="exportCSV()">⬇️ Export All Data as CSV</button>
+        <!-- Reset — Super Admin only -->
+        <div id="reset-btn-wrapper" style="display:none">
+          <button class="btn btn-danger" onclick="confirmReset()">🔄 Reset All Data to Snapshot</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div><!-- /admin-panel -->
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Apps Script REST endpoint (update after each new deployment) ──
+// Leave empty to fall back to localStorage for local testing
+const API_URL = 'https://script.google.com/macros/s/AKfycbxVC0aJis6bhgPCzzNDXsLNXxzbqFy-ZZRvayzwlJoOUmOAxMBmgxgGswK7FlSEWOCcXQ/exec'
+
+// ═══════════════════════════════════════════
+// SEED DATA (embedded from existing inventory)
+// ═══════════════════════════════════════════
+const ASSET_CATS = [
+  'Boat & Fishing Equipment',
+  'Computers',
+  'Refrigerator/Freezer',
+  'Kitchen Equipment',
+  'Office Equipment',
+  'Tools',
+  'Furniture & Fixtures',
+  'Vehicles'
+];
+
+const SEED = {
+  "boats": [
+    "REEF RAIDER",
+    "RAMPAGE",
+    "TROPICAL STAR",
+    "Halcyon III",
+    "F250GET",
+    "Xylo",
+    "Activa 125",
+    "Activa 110",
+    "KTM",
+    "Guest House",
+    "DollyGunj A31",
+    "DG"
+  ],
+  "parts": [
+    {
+      "id": "6CE-45373-00 ANODE",
+      "pn": "6CE-45373-00 ANODE",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 4.0
+    },
+    {
+      "id": "6G5-45251-02 ANODE",
+      "pn": "6G5-45251-02 ANODE",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 4.0
+    },
+    {
+      "id": "6P3-WS24A-02 ELEMENT FILTER",
+      "pn": "6P3-WS24A-02 ELEMENT FILTER",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 0.0
+    },
+    {
+      "id": "N26-13440-03-00 OIL FILTER ASSY",
+      "pn": "N26-13440-03-00 OIL FILTER ASSY",
+      "boat": "Rampage & TS F250GET F200BET",
+      "unit": "PCS",
+      "balance": 4.0
+    },
+    {
+      "id": "90794-46911-00 ELEMENT 10 MICRON",
+      "pn": "90794-46911-00 ELEMENT 10 MICRON",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 9.0
+    },
+    {
+      "id": "6CE-45225-00 WATER COVER INLET",
+      "pn": "6CE-45225-00 WATER COVER INLET",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "6E5-44352-01 IMPELLER",
+      "pn": "6E5-44352-01 IMPELLER",
+      "boat": "Rampage & TS F250GET F200BET",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "6CE-44352-00 IMPELLER",
+      "pn": "6CE-44352-00 IMPELLER",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "67F-12411-01 THERMOSTAT",
+      "pn": "67F-12411-01 THERMOSTAT",
+      "boat": "Rampage & TS F250GET F200BET",
+      "unit": "PCS",
+      "balance": 4.0
+    },
+    {
+      "id": "6CE-12411-00 THERMOSTAT",
+      "pn": "6CE-12411-00 THERMOSTAT",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 0.0
+    },
+    {
+      "id": "6CB-24482-00 GASKET 1",
+      "pn": "6CB-24482-00 GASKET 1",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 0.0
+    },
+    {
+      "id": "90430-08003 GASKET",
+      "pn": "90430-08003 GASKET",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 19.0
+    },
+    {
+      "id": "90280-04002 KEY WOODFUFF",
+      "pn": "90280-04002 KEY WOODFUFF",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "90280-04M05 KEY WOODRUFF",
+      "pn": "90280-04M05 KEY WOODRUFF",
+      "boat": "Rampage & TS F250GET F200BET",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "90430-14M09 GASKET",
+      "pn": "90430-14M09 GASKET",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 0.0
+    },
+    {
+      "id": "6AW-81950-00 RELAY ASSY",
+      "pn": "6AW-81950-00 RELAY ASSY",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "6CE-45C81-00 DAMPER RUBBER PROPELLER",
+      "pn": "6CE-45C81-00 DAMPER RUBBER PROPELLER",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 3.0
+    },
+    {
+      "id": "6CB-14546-00 VALVE NEEDLE",
+      "pn": "6CB-14546-00 VALVE NEEDLE",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 7.0
+    },
+    {
+      "id": "6C5-86120-00 SOLENOID VALVE ASSY",
+      "pn": "6C5-86120-00 SOLENOID VALVE ASSY",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "6P2-82380-00 SENSOR PRESSURE",
+      "pn": "6P2-82380-00 SENSOR PRESSURE",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "6C5-13906-01 REGULATOR PRESSURE",
+      "pn": "6C5-13906-01 REGULATOR PRESSURE",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "94702-00391 SPARK PLUGS",
+      "pn": "94702-00391 SPARK PLUGS",
+      "boat": "Rampage & TS F250GET F200BET",
+      "unit": "PCS",
+      "balance": 11.0
+    },
+    {
+      "id": "94702-00400 SPARK PLUGS",
+      "pn": "94702-00400 SPARK PLUGS",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 40.0
+    },
+    {
+      "id": "6X6-82563-01 TRIM & TILT SWITCH A",
+      "pn": "6X6-82563-01 TRIM & TILT SWITCH A",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "6BR-82563-01 TRIM & TILT SWITCH ASSY",
+      "pn": "6BR-82563-01 TRIM & TILT SWITCH ASSY",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "61A-43835-01 PIPE",
+      "pn": "61A-43835-01 PIPE",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "69J-43833-01 PIPE",
+      "pn": "69J-43833-01 PIPE",
+      "boat": "Rampage & TS F250GET F200BET",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "6CE-68303-00 SENSOR ASSY",
+      "pn": "6CE-68303-00 SENSOR ASSY",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "90890-06513 Gearbox Special Tools",
+      "pn": "90890-06513 Gearbox Special Tools",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "90890-06674 Gearbox Special Tools",
+      "pn": "90890-06674 Gearbox Special Tools",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "90890-06677 Gearbox Special Tools",
+      "pn": "90890-06677 Gearbox Special Tools",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "90183-061A6 NUT SPRING",
+      "pn": "90183-061A6 NUT SPRING",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 0.0
+    },
+    {
+      "id": "90111-06142 BOLT HEX SOCKET BUTTON",
+      "pn": "90111-06142 BOLT HEX SOCKET BUTTON",
+      "boat": "Rampage & TS F250GET F200BET",
+      "unit": "PCS",
+      "balance": 12.0
+    },
+    {
+      "id": "63P-85886-00 SENSOR AIR TEMPRATURE",
+      "pn": "63P-85886-00 SENSOR AIR TEMPRATURE",
+      "boat": "Rampage & TS F250GET F200BET",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "69J-13440-03 OIL FILTER",
+      "pn": "69J-13440-03 OIL FILTER",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 9.0
+    },
+    {
+      "id": "6CB-82310-00 IGNITION COIL ASSY",
+      "pn": "6CB-82310-00 IGNITION COIL ASSY",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 4.0
+    },
+    {
+      "id": "69J-81840-11 BRUSH HOLDER ASSY",
+      "pn": "69J-81840-11 BRUSH HOLDER ASSY",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 0.0
+    },
+    {
+      "id": "67F-81850-00 ARMATURE ASSY",
+      "pn": "67F-81850-00 ARMATURE ASSY",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 0.0
+    },
+    {
+      "id": "6P2-13907-20 FUEL PUMP COMP",
+      "pn": "6P2-13907-20 FUEL PUMP COMP",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 0.0
+    },
+    {
+      "id": "6CB-13907-10 FUEL PUMPCOMP",
+      "pn": "6CB-13907-10 FUEL PUMPCOMP",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "6CB-13906-01 REGULATOR PRESSURE",
+      "pn": "6CB-13906-01 REGULATOR PRESSURE",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 4.0
+    },
+    {
+      "id": "63P-81950-00 RELAY ASSY",
+      "pn": "63P-81950-00 RELAY ASSY",
+      "boat": "Rampage & TS F250GET F200BET",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "6P3-WS24A-01 ELEMENT FILTER",
+      "pn": "6P3-WS24A-01 ELEMENT FILTER",
+      "boat": "Rampage & TS F250GET F200BET",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "6CB-24501-01 FILTER FUEL",
+      "pn": "6CB-24501-01 FILTER FUEL",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 0.0
+    },
+    {
+      "id": "6AW-83651-00 SENDER OIL PRESSURE",
+      "pn": "6AW-83651-00 SENDER OIL PRESSURE",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "60V-8259F-00 SWITCH ASSY",
+      "pn": "60V-8259F-00 SWITCH ASSY",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "704-82563-51 TRIM TILT ASSY SWITCH",
+      "pn": "704-82563-51 TRIM TILT ASSY SWITCH",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "704-82563-52 TRIM TILT ASSY SWITCH",
+      "pn": "704-82563-52 TRIM TILT ASSY SWITCH",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "704-82563-J2 TRIM TILT ASSY SWITCH",
+      "pn": "704-82563-J2 TRIM TILT ASSY SWITCH",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "704-82563-H2 TRIM TILT ASSY SWITCH",
+      "pn": "704-82563-H2 TRIM TILT ASSY SWITCH",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "90171-18M04 NUT CASTLE",
+      "pn": "90171-18M04 NUT CASTLE",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 4.0
+    },
+    {
+      "id": "69J-11301-00 ANODE COVER ASSY",
+      "pn": "69J-11301-00 ANODE COVER ASSY",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 0.0
+    },
+    {
+      "id": "90386-25M31 BUSHING",
+      "pn": "90386-25M31 BUSHING",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "6AW-13781-00 DAMPER PUMP",
+      "pn": "6AW-13781-00 DAMPER PUMP",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "92990-18200 WASHER",
+      "pn": "92990-18200 WASHER",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "6CB-14985-00 FLOAT",
+      "pn": "6CB-14985-00 FLOAT",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 4.0
+    },
+    {
+      "id": "6P2-15512-00 GEAR IDLER 1",
+      "pn": "6P2-15512-00 GEAR IDLER 1",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 4.0
+    },
+    {
+      "id": "6P2-82310-01 IGNITION COIL ASSY",
+      "pn": "6P2-82310-01 IGNITION COIL ASSY",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "6BR-82563-01 TRIM TILT SWITCH ASSY",
+      "pn": "6BR-82563-01 TRIM TILT SWITCH ASSY",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "69J-8259F-00 SWITCH ASSY",
+      "pn": "69J-8259F-00 SWITCH ASSY",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 3.0
+    },
+    {
+      "id": "69J-14989-00 AIR VENT",
+      "pn": "69J-14989-00 AIR VENT",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "90386-90M90 BUSH",
+      "pn": "90386-90M90 BUSH",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "90386-06M12 BUSH",
+      "pn": "90386-06M12 BUSH",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "6CB-14239-00 SEAL",
+      "pn": "6CB-14239-00 SEAL",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "6CB-14989-00 ORIFICE AIR VENT",
+      "pn": "6CB-14989-00 ORIFICE AIR VENT",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "90179-06M28-00 NUT",
+      "pn": "90179-06M28-00 NUT",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 3.0
+    },
+    {
+      "id": "90105-10M00  BOLT FLANGE",
+      "pn": "90105-10M00  BOLT FLANGE",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "6CB-13016-00 O -RING",
+      "pn": "6CB-13016-00 O -RING",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "69J-82563-01 TRIM TILT SWITCH ASS",
+      "pn": "69J-82563-01 TRIM TILT SWITCH ASS",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 3.0
+    },
+    {
+      "id": "90501-12082-00 SPRING COMPRESSION",
+      "pn": "90501-12082-00 SPRING COMPRESSION",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "6AW-8195A-00 RELAY ASSY",
+      "pn": "6AW-8195A-00 RELAY ASSY",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 4.0
+    },
+    {
+      "id": "6P2-81460-00 STATOR AND BASE ASSY",
+      "pn": "6P2-81460-00 STATOR AND BASE ASSY",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 0.0
+    },
+    {
+      "id": "93501-04M02 BALL",
+      "pn": "93501-04M02 BALL",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "69J-24410-02 FUEL PUMP",
+      "pn": "69J-24410-02 FUEL PUMP",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "6CB-24410-00 FUEL PUMP ASSY",
+      "pn": "6CB-24410-00 FUEL PUMP ASSY",
+      "boat": "Rampage & TS F250GET F200BET",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "6Y2-24360-60 PRIMER PUMP ASSY",
+      "pn": "6Y2-24360-60 PRIMER PUMP ASSY",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 0.0
+    },
+    {
+      "id": "6K1-82575-00 ENGINE STOP SWITCH",
+      "pn": "6K1-82575-00 ENGINE STOP SWITCH",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "69J-44122-00 BUSHING SHIFT ROD LEVER",
+      "pn": "69J-44122-00 BUSHING SHIFT ROD LEVER",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "6CB-1447B-00 BUSH 1",
+      "pn": "6CB-1447B-00 BUSH 1",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "6CE-43810-00 TILT PISTON SUB ASSY",
+      "pn": "6CE-43810-00 TILT PISTON SUB ASSY",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "60V-81975-A0 PLATE RECTIFIER FITTING",
+      "pn": "60V-81975-A0 PLATE RECTIFIER FITTING",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "6CE-44150-00 HANDLE GEAR SHIFT ASSY",
+      "pn": "6CE-44150-00 HANDLE GEAR SHIFT ASSY",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "93311-83280 BEARING",
+      "pn": "93311-83280 BEARING",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 0.0
+    },
+    {
+      "id": "93210-33M85 O RING",
+      "pn": "93210-33M85 O RING",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "93210-94003 O RING",
+      "pn": "93210-94003 O RING",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "93210-65752-00 O RING",
+      "pn": "93210-65752-00 O RING",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "93210-37M67 O RING",
+      "pn": "93210-37M67 O RING",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "93211-02001 GASKET",
+      "pn": "93211-02001 GASKET",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "93106-10001 OIL SEAL",
+      "pn": "93106-10001 OIL SEAL",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "93104-22M07 OIL SEAL",
+      "pn": "93104-22M07 OIL SEAL",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "93101-30019 OIL SEAL",
+      "pn": "93101-30019 OIL SEAL",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "93101-30002 OIL SEAL",
+      "pn": "93101-30002 OIL SEAL",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "93101-28M16 OIL SEAL",
+      "pn": "93101-28M16 OIL SEAL",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 3.0
+    },
+    {
+      "id": "6CE-45321-20 PLATE",
+      "pn": "6CE-45321-20 PLATE",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "90110-05039 BOLT HEXAGON",
+      "pn": "90110-05039 BOLT HEXAGON",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 3.0
+    },
+    {
+      "id": "90152-05M08 SCREW COUNTERSUNK",
+      "pn": "90152-05M08 SCREW COUNTERSUNK",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "6AW-45723 PLATE SEAL",
+      "pn": "6AW-45723 PLATE SEAL",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "6P2-45214 COVER WATER INLET 1",
+      "pn": "6P2-45214 COVER WATER INLET 1",
+      "boat": "Rampage & TS F250GET F200BET",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "6P2-45215 COVER WATER INLET 2",
+      "pn": "6P2-45215 COVER WATER INLET 2",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "6CE-45224 COVER WATER INLET 3",
+      "pn": "6CE-45224 COVER WATER INLET 3",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "6CE-45225 COVER WATER INLET 4",
+      "pn": "6CE-45225 COVER WATER INLET 4",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "6CE-45335-00-9S HOUSING OIL SEAL",
+      "pn": "6CE-45335-00-9S HOUSING OIL SEAL",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "93311-11832-80 BEARING",
+      "pn": "93311-11832-80 BEARING",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "6CE-81840 BRUSH HOLDER ASSY",
+      "pn": "6CE-81840 BRUSH HOLDER ASSY",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 0.0
+    },
+    {
+      "id": "933-9999-66 BEARING",
+      "pn": "933-9999-66 BEARING",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "6CB-45824-00 ADAPTER",
+      "pn": "6CB-45824-00 ADAPTER",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "6CE-45571-00 GEAR 2 (21T)",
+      "pn": "6CE-45571-00 GEAR 2 (21T)",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "93332-000A5 BEARING",
+      "pn": "93332-000A5 BEARING",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 0.0
+    },
+    {
+      "id": "93-32000-A4 BEARING",
+      "pn": "93-32000-A4 BEARING",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "93306-209U0-00 BEARING",
+      "pn": "93306-209U0-00 BEARING",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 0.0
+    },
+    {
+      "id": "6CE-45550-00 GEAR SET",
+      "pn": "6CE-45550-00 GEAR SET",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "6CF-45550 GEAR SET",
+      "pn": "6CF-45550 GEAR SET",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "6CB-45611-00 SHAFT PROPELLER",
+      "pn": "6CB-45611-00 SHAFT PROPELLER",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "6CB-45383-00 WASHER CLAW",
+      "pn": "6CB-45383-00 WASHER CLAW",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "6CB-45576-00 WATER THRUST 2",
+      "pn": "6CB-45576-00 WATER THRUST 2",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "6CB-44312-00 WATER PUMP HOUSING",
+      "pn": "6CB-44312-00 WATER PUMP HOUSING",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "6CB-45384-00 NUT",
+      "pn": "6CB-45384-00 NUT",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "93340-67011-00 BEARING",
+      "pn": "93340-67011-00 BEARING",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "6CE-45375-00 DAMPER SEAL",
+      "pn": "6CE-45375-00 DAMPER SEAL",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "6CE-45539-00 SPACER",
+      "pn": "6CE-45539-00 SPACER",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "6H1-45668-00 SHAFT",
+      "pn": "6H1-45668-00 SHAFT",
+      "boat": "Rampage & TS F250GET F200BET",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "90501-10M77-00 SPRING COMPRESSION",
+      "pn": "90501-10M77-00 SPRING COMPRESSION",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "92990-08600-00 WASHER PLATE",
+      "pn": "92990-08600-00 WASHER PLATE",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "93101-28M-16 OIL SEAL",
+      "pn": "93101-28M-16 OIL SEAL",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "931-06090-14 OIL SEAL",
+      "pn": "931-06090-14 OIL SEAL",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "93210-33M85-00 O RING",
+      "pn": "93210-33M85-00 O RING",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "932-11020-01 O RING",
+      "pn": "932-11020-01 O RING",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "93311-858-94 BEARING GEAR",
+      "pn": "93311-858-94 BEARING GEAR",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "93315-43061-00 BEARING",
+      "pn": "93315-43061-00 BEARING",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 0.0
+    },
+    {
+      "id": "93501-04011-00 BALL",
+      "pn": "93501-04011-00 BALL",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "936-0816M-16 PIN DOWEL",
+      "pn": "936-0816M-16 PIN DOWEL",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "99001-08600-00 CIRCLIP",
+      "pn": "99001-08600-00 CIRCLIP",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "6CE-45244-00 NUT",
+      "pn": "6CE-45244-00 NUT",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "61A-45635-00 PLUNGER SHIFT",
+      "pn": "61A-45635-00 PLUNGER SHIFT",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "65N-45321-00 PLATE",
+      "pn": "65N-45321-00 PLATE",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "6AW-44312-00 WATER PUMP HOUSING",
+      "pn": "6AW-44312-00 WATER PUMP HOUSING",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "663-45376-00 GUIDE SEAL DAMPER",
+      "pn": "663-45376-00 GUIDE SEAL DAMPER",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "6AW-45344-00 OIL SEAL",
+      "pn": "6AW-45344-00 OIL SEAL",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "6AW-45723-00 PLATE SEAL",
+      "pn": "6AW-45723-00 PLATE SEAL",
+      "boat": "Rampage & TS F250GET F200BET",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "6AW-44365-00 DAMPER WATER SEAL 1",
+      "pn": "6AW-44365-00 DAMPER WATER SEAL 1",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "90105-08M61-00 BOLT WASHER",
+      "pn": "90105-08M61-00 BOLT WASHER",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "90170-16M19-00 NUT",
+      "pn": "90170-16M19-00 NUT",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "90170-30M18-00 NUT6T5",
+      "pn": "90170-30M18-00 NUT6T5",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "902-0116M-00 WASHER",
+      "pn": "902-0116M-00 WASHER",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "902-0016M-00 WASHER PLATE",
+      "pn": "902-0016M-00 WASHER PLATE",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "90201-02M00-00 WASHER PLATE",
+      "pn": "90201-02M00-00 WASHER PLATE",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "902-01410-08 WASHER PLATE",
+      "pn": "902-01410-08 WASHER PLATE",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "902-01620-08 WASHER PLATE",
+      "pn": "902-01620-08 WASHER PLATE",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "90214-30003-00 WASHER CLAW",
+      "pn": "90214-30003-00 WASHER CLAW",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "90250-08M07-00 PIN STRAIGHT",
+      "pn": "90250-08M07-00 PIN STRAIGHT",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "90282-05008-00 KEY STRAIGHT",
+      "pn": "90282-05008-00 KEY STRAIGHT",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "6CE-45501-00 DRIVE SHAFT COMP",
+      "pn": "6CE-45501-00 DRIVE SHAFT COMP",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "BEARING 6CE-45332-00-CA",
+      "pn": "BEARING 6CE-45332-00-CA",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 0.0
+    },
+    {
+      "id": "BRUSH HOLDER ASSY 6CE-81840-01",
+      "pn": "BRUSH HOLDER ASSY 6CE-81840-01",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "6CB-14984-00 GASKET FLOAT CHAMBER JOINT",
+      "pn": "6CB-14984-00 GASKET FLOAT CHAMBER JOINT",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 4.0
+    },
+    {
+      "id": "GASKET 6P3-24564-00",
+      "pn": "GASKET 6P3-24564-00",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "6CB-1447B-00  BUSH 1",
+      "pn": "6CB-1447B-00  BUSH 1",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "6B-24460-00 RELIEF VALVE ASSY",
+      "pn": "6B-24460-00 RELIEF VALVE ASSY",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "6CB-W4624-00 BELT(WITH ROTOR BOLTS)",
+      "pn": "6CB-W4624-00 BELT(WITH ROTOR BOLTS)",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "6S1-W0078-01 WATER PUMP REPAIR KIT",
+      "pn": "6S1-W0078-01 WATER PUMP REPAIR KIT",
+      "boat": "All Yamaha Engines",
+      "unit": "SET",
+      "balance": 3.0
+    },
+    {
+      "id": "6CE-45373-00  TAB TRIM",
+      "pn": "6CE-45373-00  TAB TRIM",
+      "boat": "Rampage & TS F250GET F200BET",
+      "unit": "PCS",
+      "balance": 0.0
+    },
+    {
+      "id": "704-82590-10 WIRE HARNESS ASSY",
+      "pn": "704-82590-10 WIRE HARNESS ASSY",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "6Y8-82521-11     2 FT PIG TAIL BUS",
+      "pn": "6Y8-82521-11     2 FT PIG TAIL BUS",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 4.0
+    },
+    {
+      "id": "6Y8-83553-02 WIRE LEAD",
+      "pn": "6Y8-83553-02 WIRE LEAD",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "6P2-46241-02 BELT",
+      "pn": "6P2-46241-02 BELT",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "6CB-11590-04 TENSIONER ASSY",
+      "pn": "6CB-11590-04 TENSIONER ASSY",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 4.0
+    },
+    {
+      "id": "6P2-11590-03 TENSIONER ASSY",
+      "pn": "6P2-11590-03 TENSIONER ASSY",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 0.0
+    },
+    {
+      "id": "6CE-45501-00 Drive Shaft",
+      "pn": "6CE-45501-00 Drive Shaft",
+      "boat": "Reef Raider F250DET",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "63P-13915-00 FILTER",
+      "pn": "63P-13915-00 FILTER",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "69J-4386K-00 SPRING, BRUSH",
+      "pn": "69J-4386K-00 SPRING, BRUSH",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 8.0
+    },
+    {
+      "id": "6CB-13016-00 O-RING",
+      "pn": "6CB-13016-00 O-RING",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 4.0
+    },
+    {
+      "id": "6CB-14293-00 SEAL",
+      "pn": "6CB-14293-00 SEAL",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "69J-43891-00 Brush",
+      "pn": "69J-43891-00 Brush",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 8.0
+    },
+    {
+      "id": "6CB-13907-12 FUEL PUMP COMP",
+      "pn": "6CB-13907-12 FUEL PUMP COMP",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "6CB-13593-00 DAMPER",
+      "pn": "6CB-13593-00 DAMPER",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "63P-13716-00 COLLAR",
+      "pn": "63P-13716-00 COLLAR",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "90206-14N50 WAVE WASHER",
+      "pn": "90206-14N50 WAVE WASHER",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 1.0
+    },
+    {
+      "id": "90183-061A6 SPRING NUT",
+      "pn": "90183-061A6 SPRING NUT",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "69J-45318-01 DRIVESHAFT BUSHING",
+      "pn": "69J-45318-01 DRIVESHAFT BUSHING",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "93420-36M01-00 CIRCLE CLIP",
+      "pn": "93420-36M01-00 CIRCLE CLIP",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "6CE-45225-00 WATER INLET COVER",
+      "pn": "6CE-45225-00 WATER INLET COVER",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "6CE-45224-00 WATER INLET COVER",
+      "pn": "6CE-45224-00 WATER INLET COVER",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 2.0
+    },
+    {
+      "id": "None",
+      "pn": "None",
+      "boat": "All Yamaha Engines",
+      "unit": "PCS",
+      "balance": 0.0
+    }
+  ],
+  "linen": [
+    {
+      "id": "L1.0",
+      "name": "BED SHEET COVER SINGLE",
+      "qty": 37.0
+    },
+    {
+      "id": "L2.0",
+      "name": "BED SHEET DOUBLE",
+      "qty": 9.0
+    },
+    {
+      "id": "L3.0",
+      "name": "PILLOW COVER",
+      "qty": 50.0
+    },
+    {
+      "id": "L4.0",
+      "name": "BATH TOWEL CREAM",
+      "qty": 12.0
+    },
+    {
+      "id": "L5.0",
+      "name": "BATH TOWEL WHITE",
+      "qty": 15.0
+    },
+    {
+      "id": "L6.0",
+      "name": "HAND TOWEL CREAM",
+      "qty": 11.0
+    },
+    {
+      "id": "L7.0",
+      "name": "BATH MAT",
+      "qty": 13.0
+    },
+    {
+      "id": "L8.0",
+      "name": "HAND TOWEL WHITE",
+      "qty": 12.0
+    },
+    {
+      "id": "L9.0",
+      "name": "ZIP COVER PILLOW",
+      "qty": 29.0
+    },
+    {
+      "id": "L10.0",
+      "name": "FLOOR MAT",
+      "qty": 6.0
+    },
+    {
+      "id": "L11.0",
+      "name": "GREEN PILLOW COVER SMALL & BIG",
+      "qty": 19.0
+    },
+    {
+      "id": "L12.0",
+      "name": "BED RUNNER SINGLE",
+      "qty": 2.0
+    },
+    {
+      "id": "L13.0",
+      "name": "BED RUNNER DOUBLE",
+      "qty": 1.0
+    },
+    {
+      "id": "L14.0",
+      "name": "BLANKET SINGLE",
+      "qty": 1.0
+    },
+    {
+      "id": "L15.0",
+      "name": "BLANKET DOUBLE",
+      "qty": 11.0
+    },
+    {
+      "id": "L16.0",
+      "name": "FLOOR MAT BIG",
+      "qty": 1.0
+    },
+    {
+      "id": "L17.0",
+      "name": "MATTRESS COVER",
+      "qty": 8.0
+    },
+    {
+      "id": "L18.0",
+      "name": "CLOTHES HANGER",
+      "qty": 51.0
+    },
+    {
+      "id": "L19.0",
+      "name": "SOFA SEAT COVER BIG",
+      "qty": 2.0
+    },
+    {
+      "id": "L20.0",
+      "name": "CHAIR SEAT COVER",
+      "qty": 12.0
+    },
+    {
+      "id": "L21.0",
+      "name": "OUTDOOR SEAT COVER",
+      "qty": 9.0
+    },
+    {
+      "id": "L22.0",
+      "name": "OUTDOOR BACKREST COVER",
+      "qty": 6.0
+    }
+  ],
+  "glass": [
+    {
+      "id": "G1.0",
+      "name": "SERVICE  PLATE",
+      "qty": 2.0
+    },
+    {
+      "id": "G2.0",
+      "name": "BOAT SHAPE SALAD PLATE",
+      "qty": 5.0
+    },
+    {
+      "id": "G3.0",
+      "name": "DINNER PLATE",
+      "qty": 20.0
+    },
+    {
+      "id": "G4.0",
+      "name": "QUARTER PLATE",
+      "qty": 19.0
+    },
+    {
+      "id": "G5.0",
+      "name": "WHISKEY GLASS",
+      "qty": 9.0
+    },
+    {
+      "id": "G6.0",
+      "name": "BEER MUG",
+      "qty": 9.0
+    },
+    {
+      "id": "G7.0",
+      "name": "KETTLE",
+      "qty": 2.0
+    },
+    {
+      "id": "G8.0",
+      "name": "JUICE GLASS",
+      "qty": 13.0
+    },
+    {
+      "id": "G9.0",
+      "name": "TEA CUP",
+      "qty": 13.0
+    },
+    {
+      "id": "G10.0",
+      "name": "ICE-CREAM BOWL",
+      "qty": 17.0
+    },
+    {
+      "id": "G11.0",
+      "name": "SAUCE BOWL",
+      "qty": 8.0
+    },
+    {
+      "id": "G12.0",
+      "name": "WATER JUG",
+      "qty": 4.0
+    },
+    {
+      "id": "G13.0",
+      "name": "SAUCER",
+      "qty": 8.0
+    },
+    {
+      "id": "G14.0",
+      "name": "PORTION KHARI ( copper khari)",
+      "qty": 6.0
+    },
+    {
+      "id": "G15.0",
+      "name": "SIR LUNCH CONTAINER",
+      "qty": 3.0
+    },
+    {
+      "id": "G16.0",
+      "name": "GLASS BOWL BIG",
+      "qty": 6.0
+    },
+    {
+      "id": "G17.0",
+      "name": "GLASS BOWL SMALL",
+      "qty": 3.0
+    },
+    {
+      "id": "G18.0",
+      "name": "DAL BOWL",
+      "qty": 4.0
+    },
+    {
+      "id": "G19.0",
+      "name": "SOUP BOWL SMALL",
+      "qty": 3.0
+    },
+    {
+      "id": "G20.0",
+      "name": "SOUP BOWL BIG",
+      "qty": 2.0
+    },
+    {
+      "id": "G21.0",
+      "name": "DINNER SPOON BIG",
+      "qty": 35.0
+    },
+    {
+      "id": "G22.0",
+      "name": "FORK",
+      "qty": 33.0
+    },
+    {
+      "id": "G23.0",
+      "name": "BUTTER KNIFE",
+      "qty": 14.0
+    },
+    {
+      "id": "G24.0",
+      "name": "TEA SPOON",
+      "qty": 15.0
+    },
+    {
+      "id": "G25.0",
+      "name": "Water Glass",
+      "qty": 16.0
+    },
+    {
+      "id": "G26.0",
+      "name": "CRAB CUTTER",
+      "qty": 5.0
+    },
+    {
+      "id": "G27.0",
+      "name": "CUP CAKE TRAY",
+      "qty": 2.0
+    },
+    {
+      "id": "G28.0",
+      "name": "ALUMINIUM MOBCUP",
+      "qty": 6.0
+    },
+    {
+      "id": "G29.0",
+      "name": "WIRED WHISK",
+      "qty": 1.0
+    },
+    {
+      "id": "G30.0",
+      "name": "POTATO SCOOPER",
+      "qty": 1.0
+    },
+    {
+      "id": "G31.0",
+      "name": "DESIGN KNIFE",
+      "qty": 1.0
+    },
+    {
+      "id": "G32.0",
+      "name": "JHARA V SHAPE",
+      "qty": 1.0
+    },
+    {
+      "id": "G33.0",
+      "name": "KITCHEN APRON",
+      "qty": 4.0
+    }
+  ],
+  "tackle_cats": [
+    "Hooks & Terminal Tackle",
+    "Rods",
+    "Reels",
+    "Lines & Leaders",
+    "Apparel",
+    "Jigs",
+    "Lures"
+  ],
+  "tackle_items": [
+    {
+      "id": "Hooks_&_Terminal_Tackle|Mustad",
+      "cat": "Hooks & Terminal Tackle",
+      "desc": "Mustad Circle Hook - Heavy 39950 #10/0",
+      "qty": 3.0
+    },
+    {
+      "id": "Hooks_&_Terminal_Tackle|Mustad",
+      "cat": "Hooks & Terminal Tackle",
+      "desc": "Mustad Circle Hook - Heavy 39950 #8/0",
+      "qty": 1.0
+    },
+    {
+      "id": "Hooks_&_Terminal_Tackle|AFC_HQ",
+      "cat": "Hooks & Terminal Tackle",
+      "desc": "AFC HQ SS Split Ring Size 5",
+      "qty": 6.0
+    },
+    {
+      "id": "Hooks_&_Terminal_Tackle|AFC_SS",
+      "cat": "Hooks & Terminal Tackle",
+      "desc": "AFC SS Rolling Swivel Size 2",
+      "qty": 6.0
+    },
+    {
+      "id": "Hooks_&_Terminal_Tackle|AFC_HQ",
+      "cat": "Hooks & Terminal Tackle",
+      "desc": "AFC HQ SS Split Ring Size 8",
+      "qty": 6.0
+    },
+    {
+      "id": "Hooks_&_Terminal_Tackle|AFC_SS",
+      "cat": "Hooks & Terminal Tackle",
+      "desc": "AFC SS Rolling Swivel Size 4",
+      "qty": 6.0
+    },
+    {
+      "id": "Hooks_&_Terminal_Tackle|Crimso",
+      "cat": "Hooks & Terminal Tackle",
+      "desc": "Crimson BB Swivels Sz: 6 SVP5-6BB3",
+      "qty": 5.0
+    },
+    {
+      "id": "Hooks_&_Terminal_Tackle|Fuji_G",
+      "cat": "Hooks & Terminal Tackle",
+      "desc": "Fuji Guide (Tip Top) PMNST16-4.0",
+      "qty": 3.0
+    },
+    {
+      "id": "Hooks_&_Terminal_Tackle|None",
+      "cat": "Hooks & Terminal Tackle",
+      "desc": "None",
+      "qty": 0.0
+    },
+    {
+      "id": "Rods|None",
+      "cat": "Rods",
+      "desc": "None",
+      "qty": 0.0
+    },
+    {
+      "id": "Reels|None",
+      "cat": "Reels",
+      "desc": "None",
+      "qty": 0.0
+    },
+    {
+      "id": "Lines_&_Leaders|MajorCraft_Fir",
+      "cat": "Lines & Leaders",
+      "desc": "MajorCraft First Jig #001 Iwashi FJ-200#001",
+      "qty": 1.0
+    },
+    {
+      "id": "Lines_&_Leaders|MajorCraft_Fir",
+      "cat": "Lines & Leaders",
+      "desc": "MajorCraft First Jig #003 Red-Gold FJ-200#003",
+      "qty": 1.0
+    },
+    {
+      "id": "Lines_&_Leaders|MajorCraft_Fir",
+      "cat": "Lines & Leaders",
+      "desc": "MajorCraft First Jig #004 Blue-Pink FJ-200#004",
+      "qty": 1.0
+    },
+    {
+      "id": "Lines_&_Leaders|MajorCraft_Fir",
+      "cat": "Lines & Leaders",
+      "desc": "MajorCraft First Jig #007 Zebra Glow FJ-200#007",
+      "qty": 1.0
+    },
+    {
+      "id": "Apparel|BKK_Full_Finger_Jiggin",
+      "cat": "Apparel",
+      "desc": "BKK Full Finger Jigging Gloves Size XL",
+      "qty": 4.0
+    },
+    {
+      "id": "Apparel|None",
+      "cat": "Apparel",
+      "desc": "None",
+      "qty": 0.0
+    },
+    {
+      "id": "Jigs|None",
+      "cat": "Jigs",
+      "desc": "None",
+      "qty": 0.0
+    },
+    {
+      "id": "Jigs|MajorCraft_First_Jig_#001",
+      "cat": "Jigs",
+      "desc": "MajorCraft First Jig #001 Iwashi FJ-200#001",
+      "qty": 1.0
+    },
+    {
+      "id": "Jigs|MajorCraft_First_Jig_#003",
+      "cat": "Jigs",
+      "desc": "MajorCraft First Jig #003 Red-Gold FJ-200#003",
+      "qty": 1.0
+    },
+    {
+      "id": "Jigs|MajorCraft_First_Jig_#004",
+      "cat": "Jigs",
+      "desc": "MajorCraft First Jig #004 Blue-Pink FJ-200#004",
+      "qty": 1.0
+    },
+    {
+      "id": "Jigs|MajorCraft_First_Jig_#007",
+      "cat": "Jigs",
+      "desc": "MajorCraft First Jig #007 Zebra Glow FJ-200#007",
+      "qty": 1.0
+    },
+    {
+      "id": "Jigs|MajorCraft_First_Jig_#011",
+      "cat": "Jigs",
+      "desc": "MajorCraft First Jig #011 Green Gold FJ-200#011",
+      "qty": 1.0
+    },
+    {
+      "id": "Jigs|MajorCraft_First_Jig_#029",
+      "cat": "Jigs",
+      "desc": "MajorCraft First Jig #029 Pink Iwashi FJ-200#029",
+      "qty": 3.0
+    },
+    {
+      "id": "Jigs|MajorCraft_First_Jig_#048",
+      "cat": "Jigs",
+      "desc": "MajorCraft First Jig #048 Zebra Red Gold FJ-150#048",
+      "qty": 2.0
+    },
+    {
+      "id": "Jigs|MajorCraft_First_Jig_#001",
+      "cat": "Jigs",
+      "desc": "MajorCraft First Jig #001 Iwashi FJ-150#001",
+      "qty": 3.0
+    },
+    {
+      "id": "Jigs|MajorCraft_First_Jig_#011",
+      "cat": "Jigs",
+      "desc": "MajorCraft First Jig #011 Green Gold FJ-150#011",
+      "qty": 2.0
+    },
+    {
+      "id": "Jigs|MajorCraft_First_Jig_#008",
+      "cat": "Jigs",
+      "desc": "MajorCraft First Jig #008 Silver FJ-200#008",
+      "qty": 1.0
+    },
+    {
+      "id": "Jigs|MajorCraft_First_Jig_#048",
+      "cat": "Jigs",
+      "desc": "MajorCraft First Jig #048 Zebra Red Gold FJ-200#048",
+      "qty": 1.0
+    },
+    {
+      "id": "Jigs|MajorCraft_First_Jig_#003",
+      "cat": "Jigs",
+      "desc": "MajorCraft First Jig #003 Red-Gold FJ-100#003",
+      "qty": 2.0
+    },
+    {
+      "id": "Jigs|MajorCraft_First_Jig_#011",
+      "cat": "Jigs",
+      "desc": "MajorCraft First Jig #011 Green Gold FJ-100#011",
+      "qty": 2.0
+    },
+    {
+      "id": "Jigs|MajorCraft_First_Jig_#004",
+      "cat": "Jigs",
+      "desc": "MajorCraft First Jig #004 Blue-Pink FJ-100#004",
+      "qty": 1.0
+    },
+    {
+      "id": "Jigs|MajorCraft_First_Jig_#029",
+      "cat": "Jigs",
+      "desc": "MajorCraft First Jig #029 Pink Iwashi FJ-100#029",
+      "qty": 4.0
+    },
+    {
+      "id": "Jigs|MajorCraft_First_Jig_#011",
+      "cat": "Jigs",
+      "desc": "MajorCraft First Jig #011 Green Gold FJ-120#011",
+      "qty": 1.0
+    },
+    {
+      "id": "Jigs|MajorCraft_First_Jig_#001",
+      "cat": "Jigs",
+      "desc": "MajorCraft First Jig #001 Iwashi FJ-120#001",
+      "qty": 1.0
+    },
+    {
+      "id": "Jigs|MajorCraft_First_Jig_#004",
+      "cat": "Jigs",
+      "desc": "MajorCraft First Jig #004 Blue-Pink FJ-120#004",
+      "qty": 1.0
+    },
+    {
+      "id": "Jigs|MajorCraft_First_Jig_#048",
+      "cat": "Jigs",
+      "desc": "MajorCraft First Jig #048 Zebra Red Gold FJ-120#048",
+      "qty": 1.0
+    },
+    {
+      "id": "Jigs|MajorCraft_First_Jig_#029",
+      "cat": "Jigs",
+      "desc": "MajorCraft First Jig #029 Pink Iwashi FJ-120#029",
+      "qty": 1.0
+    },
+    {
+      "id": "Jigs|MajorCraft_First_Jig_180g",
+      "cat": "Jigs",
+      "desc": "MajorCraft First Jig 180gm #029 Pink Iwashi",
+      "qty": 1.0
+    },
+    {
+      "id": "Jigs|MajorCraft_First_Jig_180g",
+      "cat": "Jigs",
+      "desc": "MajorCraft First Jig 180gm #001 Iwashi",
+      "qty": 2.0
+    },
+    {
+      "id": "Jigs|MajorCraft_First_Jig_150g",
+      "cat": "Jigs",
+      "desc": "MajorCraft First Jig 150gm #003 Red-Gold",
+      "qty": 4.0
+    },
+    {
+      "id": "Jigs|MajorCraft_JPSLOW_Jig_60g",
+      "cat": "Jigs",
+      "desc": "MajorCraft JPSLOW Jig 60gm #30 ZEBRA WASHI",
+      "qty": 3.0
+    },
+    {
+      "id": "Jigs|MajorCraft_JPSLOW_Jig_60g",
+      "cat": "Jigs",
+      "desc": "MajorCraft JPSLOW Jig 60gm #7 ZEBRA Glow",
+      "qty": 2.0
+    },
+    {
+      "id": "Jigs|MajorCraft_JPSLOW_Jig_60g",
+      "cat": "Jigs",
+      "desc": "MajorCraft JPSLOW Jig 60gm #18 Glow Pink",
+      "qty": 5.0
+    },
+    {
+      "id": "Jigs|MajorCraft_JPSLOW_Jig_60g",
+      "cat": "Jigs",
+      "desc": "MajorCraft JPSLOW Jig 60gm #1 Washi",
+      "qty": 4.0
+    },
+    {
+      "id": "Jigs|MajorCraft_JPSLOW_Jig_60g",
+      "cat": "Jigs",
+      "desc": "MajorCraft JPSLOW Jig 60gm #26 Zebra Pink",
+      "qty": 4.0
+    },
+    {
+      "id": "Jigs|MajorCraft_FJ_Jig_100gm_#",
+      "cat": "Jigs",
+      "desc": "MajorCraft FJ Jig 100gm #3 Red Gold",
+      "qty": 3.0
+    },
+    {
+      "id": "Jigs|MajorCraft_FJ_Jig_100gm_#",
+      "cat": "Jigs",
+      "desc": "MajorCraft FJ Jig 100gm #29 Pink Washi",
+      "qty": 3.0
+    },
+    {
+      "id": "Jigs|Mustad_Moon_Riser_Jig_150",
+      "cat": "Jigs",
+      "desc": "Mustad Moon Riser Jig 150g Cotton Candy",
+      "qty": 18.0
+    },
+    {
+      "id": "Jigs|Mustad_Moon_Riser_Jig_150",
+      "cat": "Jigs",
+      "desc": "Mustad Moon Riser Jig 150g Full Chrome",
+      "qty": 1.0
+    },
+    {
+      "id": "Jigs|Mustad_Moon_Riser_Jig_150",
+      "cat": "Jigs",
+      "desc": "Mustad Moon Riser Jig 150g Green Mackerel",
+      "qty": 12.0
+    },
+    {
+      "id": "Jigs|Mustad_Moon_Riser_Jig_150",
+      "cat": "Jigs",
+      "desc": "Mustad Moon Riser Jig 150g Yellow Fin Tuna",
+      "qty": 7.0
+    },
+    {
+      "id": "Jigs|Mustad_Moon_Riser_Jig_150",
+      "cat": "Jigs",
+      "desc": "Mustad Moon Riser Jig 150g Blue Sardine",
+      "qty": 1.0
+    },
+    {
+      "id": "Jigs|Mustad_Moon_Riser_Jig_200",
+      "cat": "Jigs",
+      "desc": "Mustad Moon Riser Jig 200g Blue Sardine",
+      "qty": 5.0
+    },
+    {
+      "id": "Jigs|Mustad_Moon_Riser_Jig_200",
+      "cat": "Jigs",
+      "desc": "Mustad Moon Riser Jig 200g Yellow Candy",
+      "qty": 5.0
+    },
+    {
+      "id": "Jigs|Mustad_Moon_Riser_Jig_200",
+      "cat": "Jigs",
+      "desc": "Mustad Moon Riser Jig 200g Cotton Candy",
+      "qty": 6.0
+    },
+    {
+      "id": "Jigs|Mustad_Moon_Riser_Jig_250",
+      "cat": "Jigs",
+      "desc": "Mustad Moon Riser Jig 250g Yellow Candy",
+      "qty": 3.0
+    },
+    {
+      "id": "Jigs|Mustad_Moon_Riser_Jig_250",
+      "cat": "Jigs",
+      "desc": "Mustad Moon Riser Jig 250g Green Mackerel",
+      "qty": 2.0
+    },
+    {
+      "id": "Jigs|Mustad_Moon_Riser_Jig_250",
+      "cat": "Jigs",
+      "desc": "Mustad Moon Riser Jig 250g Full Chrome",
+      "qty": 3.0
+    },
+    {
+      "id": "Jigs|The_Streaker_200g_-_7oz--",
+      "cat": "Jigs",
+      "desc": "The Streaker 200g - 7oz---STRK-200-CRT",
+      "qty": 3.0
+    },
+    {
+      "id": "Jigs|The_Streaker_200g_-_7oz--",
+      "cat": "Jigs",
+      "desc": "The Streaker 200g - 7oz---STRK-200-SAR",
+      "qty": 2.0
+    },
+    {
+      "id": "Jigs|The_Streaker_200g_-_7oz--",
+      "cat": "Jigs",
+      "desc": "The Streaker 200g - 7oz---STRK-200-SG",
+      "qty": 3.0
+    },
+    {
+      "id": "Jigs|The_Streaker_160g-5-1/2oz",
+      "cat": "Jigs",
+      "desc": "The Streaker 160g-5-1/2oz---STRK-160-CRT",
+      "qty": 3.0
+    },
+    {
+      "id": "Jigs|The_Streaker_160g-5-1/2oz",
+      "cat": "Jigs",
+      "desc": "The Streaker 160g-5-1/2oz---STRK-160-SG",
+      "qty": 3.0
+    },
+    {
+      "id": "Jigs|The_Streaker_160g-5-1/2oz",
+      "cat": "Jigs",
+      "desc": "The Streaker 160g-5-1/2oz---STRK-160-YAKKA",
+      "qty": 2.0
+    },
+    {
+      "id": "Jigs|The_Streaker_120g-5-1/2oz",
+      "cat": "Jigs",
+      "desc": "The Streaker 120g-5-1/2oz---STRK-120-PFUS",
+      "qty": 1.0
+    },
+    {
+      "id": "Jigs|BLU_Junkie_150gm",
+      "cat": "Jigs",
+      "desc": "BLU Junkie 150gm",
+      "qty": 3.0
+    },
+    {
+      "id": "Jigs|Slow_Style_Conker_120g",
+      "cat": "Jigs",
+      "desc": "Slow Style Conker 120g",
+      "qty": 1.0
+    },
+    {
+      "id": "Jigs|Fisherman's_Tool_120g",
+      "cat": "Jigs",
+      "desc": "Fisherman's Tool 120g",
+      "qty": 23.0
+    },
+    {
+      "id": "Jigs|Mustad_Daggerman_Jig_100g",
+      "cat": "Jigs",
+      "desc": "Mustad Daggerman Jig 100g Green Mackerel",
+      "qty": 1.0
+    },
+    {
+      "id": "Jigs|MajorCraft_First_Jig__Gre",
+      "cat": "Jigs",
+      "desc": "MajorCraft First Jig  Green Gold FJ-100",
+      "qty": 1.0
+    },
+    {
+      "id": "Lures|Heru_Cubera_150",
+      "cat": "Lures",
+      "desc": "Heru Cubera 150",
+      "qty": 3.0
+    },
+    {
+      "id": "Lures|Feed_Pin_150",
+      "cat": "Lures",
+      "desc": "Feed Pin 150",
+      "qty": 2.0
+    },
+    {
+      "id": "Lures|Chug_Norris_180_Popper_1",
+      "cat": "Lures",
+      "desc": "Chug Norris 180 Popper 180mm---CHUG180-BPM",
+      "qty": 2.0
+    },
+    {
+      "id": "Lures|Chug_Norris_180_Popper_1",
+      "cat": "Lures",
+      "desc": "Chug Norris 180 Popper 180mm---CHUG180-CT",
+      "qty": 2.0
+    },
+    {
+      "id": "Lures|Chug_Norris_180_Popper_1",
+      "cat": "Lures",
+      "desc": "Chug Norris 180 Popper 180mm---CHUG180-SGM-",
+      "qty": 2.0
+    },
+    {
+      "id": "Lures|Chug_Norris_180_Popper_1",
+      "cat": "Lures",
+      "desc": "Chug Norris 180 Popper 180mm---CHUG180-SM-",
+      "qty": 2.0
+    },
+    {
+      "id": "Lures|Blaze_Garage_-_Saththa_-",
+      "cat": "Lures",
+      "desc": "Blaze Garage - Saththa -120 gm",
+      "qty": 2.0
+    },
+    {
+      "id": "Lures|Blaze_Garage_-_Saththa_1",
+      "cat": "Lures",
+      "desc": "Blaze Garage - Saththa 150 gm",
+      "qty": 0.0
+    },
+    {
+      "id": "Lures|Blaze_Garage_-_Kimitsu_1",
+      "cat": "Lures",
+      "desc": "Blaze Garage - Kimitsu 150 gm",
+      "qty": 0.0
+    },
+    {
+      "id": "Lures|Blaze_Garage-_Swoop_110_",
+      "cat": "Lures",
+      "desc": "Blaze Garage- Swoop 110 gm",
+      "qty": 1.0
+    },
+    {
+      "id": "Lures|None",
+      "cat": "Lures",
+      "desc": "None",
+      "qty": 0.0
+    }
+  ]
+};
+
+const GH_SEED = {
+  "Linen": [
+    {
+      "id": "L_0",
+      "name": "BED SHEET COVER SINGLE",
+      "qty": 37,
+      "price": 0
+    },
+    {
+      "id": "L_1",
+      "name": "BED SHEET DOUBLE",
+      "qty": 9,
+      "price": 0
+    },
+    {
+      "id": "L_2",
+      "name": "PILLOW COVER",
+      "qty": 50,
+      "price": 0
+    },
+    {
+      "id": "L_3",
+      "name": "BATH TOWEL CREAM",
+      "qty": 12,
+      "price": 0
+    },
+    {
+      "id": "L_4",
+      "name": "BATH TOWEL WHITE",
+      "qty": 15,
+      "price": 0
+    },
+    {
+      "id": "L_5",
+      "name": "HAND TOWEL CREAM",
+      "qty": 11,
+      "price": 0
+    },
+    {
+      "id": "L_6",
+      "name": "BATH MAT",
+      "qty": 13,
+      "price": 0
+    },
+    {
+      "id": "L_7",
+      "name": "HAND TOWEL WHITE",
+      "qty": 12,
+      "price": 0
+    },
+    {
+      "id": "L_8",
+      "name": "ZIP COVER PILLOW",
+      "qty": 29,
+      "price": 0
+    },
+    {
+      "id": "L_9",
+      "name": "FLOOR MAT",
+      "qty": 6,
+      "price": 0
+    },
+    {
+      "id": "L_10",
+      "name": "GREEN PILLOW COVER SINGLE",
+      "qty": 19,
+      "price": 0
+    },
+    {
+      "id": "L_11",
+      "name": "BED RUNNER SINGLE",
+      "qty": 2,
+      "price": 0
+    },
+    {
+      "id": "L_12",
+      "name": "BED RUNNER DOUBLE",
+      "qty": 1,
+      "price": 0
+    },
+    {
+      "id": "L_13",
+      "name": "BLANKET SINGLE",
+      "qty": 1,
+      "price": 0
+    }
+  ],
+  "Cutlery": [
+    {
+      "id": "CU_0",
+      "name": "DINNER SPOON BIG",
+      "qty": 35,
+      "price": 0
+    },
+    {
+      "id": "CU_1",
+      "name": "FORK",
+      "qty": 33,
+      "price": 0
+    },
+    {
+      "id": "CU_2",
+      "name": "BUTTER KNIFE",
+      "qty": 14,
+      "price": 0
+    },
+    {
+      "id": "CU_3",
+      "name": "TEA SPOON",
+      "qty": 15,
+      "price": 0
+    },
+    {
+      "id": "CU_4",
+      "name": "CRAB CUTTER",
+      "qty": 5,
+      "price": 0
+    },
+    {
+      "id": "CU_5",
+      "name": "SIR LUNCH CONTAINER",
+      "qty": 3,
+      "price": 0
+    }
+  ],
+  "Crockery": [
+    {
+      "id": "CR_0",
+      "name": "SERVICE PLATE",
+      "qty": 2,
+      "price": 0
+    },
+    {
+      "id": "CR_1",
+      "name": "BOAT SHAPE SALAD PLATE",
+      "qty": 5,
+      "price": 0
+    },
+    {
+      "id": "CR_2",
+      "name": "DINNER PLATE",
+      "qty": 20,
+      "price": 0
+    },
+    {
+      "id": "CR_3",
+      "name": "QUARTER PLATE",
+      "qty": 19,
+      "price": 0
+    },
+    {
+      "id": "CR_4",
+      "name": "WHISKEY GLASS",
+      "qty": 9,
+      "price": 0
+    },
+    {
+      "id": "CR_5",
+      "name": "BEER MUG",
+      "qty": 9,
+      "price": 0
+    },
+    {
+      "id": "CR_6",
+      "name": "JUICE GLASS",
+      "qty": 13,
+      "price": 0
+    },
+    {
+      "id": "CR_7",
+      "name": "TEA CUP",
+      "qty": 13,
+      "price": 0
+    },
+    {
+      "id": "CR_8",
+      "name": "ICE-CREAM BOWL",
+      "qty": 17,
+      "price": 0
+    },
+    {
+      "id": "CR_9",
+      "name": "SAUCE BOWL",
+      "qty": 8,
+      "price": 0
+    },
+    {
+      "id": "CR_10",
+      "name": "WATER JUG",
+      "qty": 4,
+      "price": 0
+    },
+    {
+      "id": "CR_11",
+      "name": "SAUCER",
+      "qty": 8,
+      "price": 0
+    },
+    {
+      "id": "CR_12",
+      "name": "PORTION KHARI (COPPER)",
+      "qty": 6,
+      "price": 0
+    },
+    {
+      "id": "CR_13",
+      "name": "GLASS BOWL BIG",
+      "qty": 6,
+      "price": 0
+    },
+    {
+      "id": "CR_14",
+      "name": "GLASS BOWL SMALL",
+      "qty": 3,
+      "price": 0
+    },
+    {
+      "id": "CR_15",
+      "name": "DAL BOWL",
+      "qty": 4,
+      "price": 0
+    },
+    {
+      "id": "CR_16",
+      "name": "SOUP BOWL SMALL",
+      "qty": 3,
+      "price": 0
+    },
+    {
+      "id": "CR_17",
+      "name": "SOUP BOWL BIG",
+      "qty": 2,
+      "price": 0
+    },
+    {
+      "id": "CR_18",
+      "name": "WATER GLASS",
+      "qty": 16,
+      "price": 0
+    }
+  ],
+  "Kitchen Equipment": [
+    {
+      "id": "KE_0",
+      "name": "KETTLE",
+      "qty": 2,
+      "price": 0
+    },
+    {
+      "id": "KE_1",
+      "name": "WIRED WHISK",
+      "qty": 1,
+      "price": 0
+    },
+    {
+      "id": "KE_2",
+      "name": "POTATO SCOOPER",
+      "qty": 1,
+      "price": 0
+    },
+    {
+      "id": "KE_3",
+      "name": "DESIGN KNIFE",
+      "qty": 1,
+      "price": 0
+    },
+    {
+      "id": "KE_4",
+      "name": "JHARA V SHAPE",
+      "qty": 1,
+      "price": 0
+    },
+    {
+      "id": "KE_5",
+      "name": "KITCHEN APRON",
+      "qty": 4,
+      "price": 0
+    },
+    {
+      "id": "KE_6",
+      "name": "CUP CAKE TRAY",
+      "qty": 2,
+      "price": 0
+    },
+    {
+      "id": "KE_7",
+      "name": "ALUMINIUM MOB CUP",
+      "qty": 6,
+      "price": 0
+    }
+  ],
+  "House Keeping": []
+};
+
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let DB = {};
+let adminUnlocked = false;
+let currentUser = null; // { name, role: 'staff'|'admin'|'superadmin' }
+
+function loadDB(savedJson) {
+  const saved = savedJson || '';
+  if (saved) {
+    DB = JSON.parse(saved);
+    // ── MIGRATION: old structure had linen/glass, new uses ghCategories ──
+    if (!DB.ghCategories) {
+      DB.ghCategories = JSON.parse(JSON.stringify(GH_SEED));
+      // Carry over any qty updates that were saved in old linen/glass arrays
+      if (DB.linen) {
+        DB.linen.forEach(old => {
+          const match = DB.ghCategories['Linen'].find(x => x.name === old.name.trim().toUpperCase());
+          if (match && old.qty) match.qty = old.qty;
+        });
+      }
+      delete DB.linen;
+      delete DB.glass;
+      saveDB();
+    }
+    // Ensure updates array always exists
+    if (!DB.updates) { DB.updates = []; saveDB(); }
+    // ── MIGRATION: add House Keeping category if not present ──
+    if (DB.ghCategories && !DB.ghCategories['House Keeping']) {
+      DB.ghCategories['House Keeping'] = [];
+      saveDB();
+    }
+    // ── MIGRATION: ensure staffUsers array exists ──
+    if (!DB.staffUsers) { DB.staffUsers = []; saveDB(); }
+    // ── MIGRATION: add superAdminPw and admins array ──
+    if (!DB.superAdminPw) { DB.superAdminPw = 'GFASUPER2026'; saveDB(); }
+    if (!DB.admins) { DB.admins = []; saveDB(); }
+    // ── MIGRATION: boats was array of strings, now array of {name, category} ──
+    if (DB.boats && DB.boats.length && typeof DB.boats[0] === 'string') {
+      DB.boats = DB.boats.map(b => ({ name: b, category: 'Boat & Fishing Equipment' }));
+      saveDB();
+    }
+  } else {
+    // First run — seed from inventory snapshot
+    DB = {
+      boats: SEED.boats.map(b => ({ name: b, category: 'Boat & Fishing Equipment' })),
+      staffUsers: [],
+      admins: [],
+      superAdminPw: 'GFASUPER2026',
+      parts: SEED.parts.map(p => ({...p})),
+      ghCategories: JSON.parse(JSON.stringify(GH_SEED)),
+      tackle_cats: [...SEED.tackle_cats],
+      tackle_items: SEED.tackle_items.map(x => ({...x})),
+      updates: [],
+      adminPw: 'GFA2026'
+    };
+    saveDB();
+  }
+}
+
+let _saveTimer = null;
+function saveDB() {
+  if (API_URL) {
+    // PWA mode — POST to Apps Script REST API (debounced)
+    clearTimeout(_saveTimer);
+    _saveTimer = setTimeout(() => {
+      fetch(API_URL, {
+        method: 'POST',
+        // text/plain avoids CORS preflight while Apps Script still reads it
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'saveData', data: JSON.stringify(DB) })
+      })
+      .then(r => r.json())
+      .then(res => { if (!res.success) showToast('⚠️ Save error — check connection', 'error'); })
+      .catch(() => showToast('⚠️ Save error — check connection', 'error'));
+    }, 800);
+  } else if (typeof google !== 'undefined' && google.script) {
+    // Legacy Apps Script web-app mode (serves HTML directly)
+    clearTimeout(_saveTimer);
+    _saveTimer = setTimeout(() => {
+      google.script.run
+        .withSuccessHandler(() => {})
+        .withFailureHandler(() => showToast('⚠️ Save error — check connection', 'error'))
+        .saveData(JSON.stringify(DB));
+    }, 800);
+  } else {
+    // Local fallback for testing
+    localStorage.setItem('gfa_inventory_db', JSON.stringify(DB));
+  }
+}
+
+// Format ISO date (YYYY-MM-DD) → dd/mm/yy for display
+function fmtDate(iso) {
+  if (!iso) return '—';
+  const [y, m, d] = iso.split('-');
+  return `${d}/${m}/${y.slice(2)}`;
+}
+
+// Format number as Rupees
+function fmtRupees(v) {
+  if (v === undefined || v === null || v === '') return '—';
+  return '₹' + Number(v).toLocaleString('en-IN');
+}
+
+// Central update logger — call instead of DB.updates.unshift() directly
+function logUpdate(entry) {
+  if (!DB.updates) DB.updates = [];
+  const byName = currentUser ? currentUser.name : 'Unknown';
+  DB.updates.unshift({ id: Date.now(), ts: new Date().toISOString(), by: byName, ...entry });
+  saveDB();
+  const updatesTab = document.getElementById('admin-tab-updates');
+  if (updatesTab && updatesTab.style.display !== 'none') renderAdminUpdates();
+  updateHomeCounts();
+}
+
+// ═══════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════
+function showSection(name) {
+  document.getElementById('view-home').style.display = 'none';
+  document.querySelectorAll('.section-view').forEach(el => el.classList.remove('active'));
+  document.getElementById('section-' + name).classList.add('active');
+  if (name === 'spareparts') { populatePartDropdowns(); renderPartsList(); }
+  if (name === 'guesthouse') { switchGHTab('Linen'); }
+  if (name === 'tackle') { populateTackleSelects(); renderTackleList(); }
+  if (name === 'maintenance') { populateMaintAsset(); renderMaintPending(); renderMaintHistory(); }
+}
+
+function goHome() {
+  document.querySelectorAll('.section-view').forEach(el => el.classList.remove('active'));
+  document.getElementById('view-home').style.display = 'block';
+  updateHomeCounts();
+}
+
+function switchTab(prefix, tab) {
+  const container = prefix === 'admin-gh' ? document.getElementById('admin-tab-gh') : document.getElementById('section-' + prefix) || document.getElementById('admin-tab-' + prefix) || document.body;
+  // Hide all tabs in this group
+  document.querySelectorAll(`[id^="${prefix}-tab-"]`).forEach(el => el.style.display = 'none');
+  // Show selected
+  const el = document.getElementById(prefix + '-tab-' + tab);
+  if (el) el.style.display = 'block';
+  // Update tab buttons
+  const section = el ? el.closest('.section-body, .admin-section, .admin-wrap') : null;
+  if (section) {
+    section.querySelectorAll('.tab-btn').forEach((btn, i) => {
+      btn.classList.toggle('active', btn.textContent.trim().toLowerCase().includes(tab.toLowerCase()) || btn.getAttribute('onclick')?.includes("'" + tab + "'"));
+    });
+  }
+  if (prefix === 'sp' && tab === 'list') renderPartsList();
+  if (prefix === 'maint' && tab === 'pending') renderMaintPending();
+  if (prefix === 'maint' && tab === 'history') renderMaintHistory();
+  if (prefix === 'tk' && tab === 'list') renderTackleList();
+  if (prefix === 'admin-gh' && tab === 'linen') renderAdminGH('linen');
+  if (prefix === 'admin-gh' && tab === 'glass') renderAdminGH('glass');
+}
+
+function updateHomeCounts() {
+  const pending = DB.updates.filter(u => u.category === 'maintenance' && u.status === 'PENDING').length;
+  document.getElementById('maint-count').textContent = pending > 0 ? `${pending} pending item${pending>1?'s':''}` : 'Tap to log entry';
+  const oos = DB.parts.filter(p => p.balance <= 0).length;
+  document.getElementById('sp-count').textContent = oos > 0 ? `${oos} out of stock` : `${DB.parts.length} parts tracked`;
+  const ghTotal = Object.values(DB.ghCategories||{}).reduce((s,arr)=>s+arr.length,0);
+  document.getElementById('gh-count').textContent = ghTotal + ' items across 4 categories';
+  document.getElementById('tk-count').textContent = `${DB.tackle_items.length} items`;
+}
+
+// ═══════════════════════════════════════════
+// MAINTENANCE
+// ═══════════════════════════════════════════
+function populateMaintAsset() {
+  const sel = document.getElementById('maint-asset');
+  const filterSel = document.getElementById('maint-filter-asset');
+  sel.innerHTML = DB.boats.map(b => `<option>${b.name}</option>`).join('');
+  filterSel.innerHTML = '<option value="">All Assets</option>' + DB.boats.map(b => `<option>${b.name}</option>`).join('');
+}
+
+function submitMaint() {
+  const asset = document.getElementById('maint-asset').value;
+  const desc = document.getElementById('maint-desc').value.trim();
+  const status = document.querySelector('input[name="maint-status"]:checked').value;
+  const date = document.getElementById('maint-date').value || new Date().toISOString().split('T')[0];
+  const port = document.getElementById('maint-port').value;
+  const stbd = document.getElementById('maint-stbd').value;
+  const remarks = document.getElementById('maint-remarks').value.trim();
+  if (!asset || !desc) { showToast('Please fill in asset and description', 'error'); return; }
+  logUpdate({ category: 'maintenance', asset, desc, status, date, port, stbd, remarks });
+  document.getElementById('maint-desc').value = '';
+  document.getElementById('maint-port').value = '';
+  document.getElementById('maint-stbd').value = '';
+  document.getElementById('maint-remarks').value = '';
+  document.getElementById('ms-completed').checked = true;
+  showToast(`✅ Maintenance entry saved for ${asset}`, 'success');
+  updateHomeCounts();
+}
+
+function renderMaintPending() {
+  const list = document.getElementById('maint-pending-list');
+  const items = DB.updates.filter(u => u.category === 'maintenance' && u.status === 'PENDING');
+  if (!items.length) { list.innerHTML = '<div class="empty-state"><div class="icon">✅</div><p>No pending items!</p></div>'; return; }
+  list.innerHTML = items.map(u => `
+    <div class="history-item pending">
+      <div>
+        <div class="history-desc">${u.asset}</div>
+        <div class="history-sub">${u.desc}</div>
+        <div class="history-meta">Logged: ${u.date}</div>
+      </div>
+      <button class="btn btn-success btn-sm" onclick="markComplete(${u.id})">✔ Done</button>
+    </div>`).join('');
+}
+
+function markComplete(id) {
+  const u = DB.updates.find(x => x.id === id);
+  if (u) { u.status = 'COMPLETED'; saveDB(); renderMaintPending(); updateHomeCounts(); showToast('Marked as completed!', 'success'); }
+}
+
+function renderMaintHistory() {
+  const list = document.getElementById('maint-history-list');
+  const filter = document.getElementById('maint-filter-asset')?.value || '';
+  let items = DB.updates.filter(u => u.category === 'maintenance');
+  if (filter) items = items.filter(u => u.asset === filter);
+  if (!items.length) { list.innerHTML = '<div class="empty-state"><div class="icon">📋</div><p>No entries yet</p></div>'; return; }
+  list.innerHTML = items.slice(0, 60).map(u => `
+    <div class="history-item ${u.status?.toLowerCase().replace(' ','-') || ''}">
+      <div style="flex:1">
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <span class="tag">${u.asset}</span>
+          <span class="badge badge-${u.status==='COMPLETED'?'completed':'pending'}">${u.status}</span>
+        </div>
+        <div class="history-desc" style="margin-top:5px">${u.desc}</div>
+        <div class="history-meta">${u.date}${u.port?' · Port: '+u.port+' hrs':''}${u.remarks?' · '+u.remarks:''}</div>
+      </div>
+      <button class="btn-icon" onclick="deleteUpdate(${u.id})" title="Delete">🗑️</button>
+    </div>`).join('');
+}
+
+function deleteUpdate(id) {
+  if (!confirm('Delete this entry?')) return;
+  DB.updates = DB.updates.filter(x => x.id !== id);
+  saveDB(); renderMaintHistory(); renderMaintPending(); renderAdminUpdates(); updateHomeCounts();
+}
+
+// ═══════════════════════════════════════════
+// SPARE PARTS
+// ═══════════════════════════════════════════
+function filterPartDropdown(mode) {
+  const q = document.getElementById(`sp-${mode === 'issue' ? 'issue' : 'recv'}-search`).value.toLowerCase();
+  const sel = document.getElementById(`sp-${mode === 'issue' ? 'issue' : 'recv'}-select`);
+  const filtered = DB.parts.filter(p => !q || p.pn.toLowerCase().includes(q) || (p.boat||'').toLowerCase().includes(q));
+  sel.innerHTML = filtered.map(p => `<option value="${p.id}">[${p.balance<=0?'OOS':'✓'} ${p.balance}] ${p.pn} (${p.boat||''})</option>`).join('');
+  updatePartBalance(mode);
+}
+
+function populatePartDropdowns() {
+  filterPartDropdown('issue');
+  filterPartDropdown('recv');
+}
+
+function updatePartBalance(mode) {
+  const sel = document.getElementById(`sp-${mode === 'issue' ? 'issue' : 'recv'}-select`);
+  const id = sel?.value;
+  const part = DB.parts.find(p => p.id === id);
+  const el = document.getElementById(`sp-${mode === 'issue' ? 'issue' : 'recv'}-balance`);
+  if (part && el) {
+    const oos = part.balance <= 0;
+    el.innerHTML = `<span style="color:${oos?'var(--red)':'var(--green)'}">Balance: <strong>${part.balance}</strong> ${part.unit||'PCS'} ${oos?'⚠️ Out of stock':''}</span>`;
+  }
+}
+
+function adjustQty(id, delta) {
+  const el = document.getElementById(id);
+  const v = parseInt(el.value) || 0;
+  el.value = Math.max(0, v + delta);
+}
+
+function submitSpIssue() {
+  const sel = document.getElementById('sp-issue-select');
+  const id = sel?.value;
+  const qty = parseInt(document.getElementById('sp-issue-qty').value) || 0;
+  const remarks = document.getElementById('sp-issue-remarks').value.trim();
+  if (!id || qty <= 0) { showToast('Select a part and enter quantity', 'error'); return; }
+  const part = DB.parts.find(p => p.id === id);
+  if (!part) return;
+  if (part.balance < qty) { showToast(`Only ${part.balance} units available!`, 'error'); return; }
+  part.balance -= qty;
+  logUpdate({ category: 'spareparts', action: 'issue', pn: part.pn, boat: part.boat, qty, balance_after: part.balance, remarks });
+  filterPartDropdown('issue');
+  document.getElementById('sp-issue-qty').value = 1;
+  document.getElementById('sp-issue-remarks').value = '';
+  showToast(`📤 Issued ${qty} × ${part.pn}. Balance: ${part.balance}`, 'success');
+  updateHomeCounts();
+}
+
+function submitSpReceive() {
+  const sel = document.getElementById('sp-recv-select');
+  const id = sel?.value;
+  const qty = parseInt(document.getElementById('sp-recv-qty').value) || 0;
+  const remarks = document.getElementById('sp-recv-remarks').value.trim();
+  if (!id || qty <= 0) { showToast('Select a part and enter quantity', 'error'); return; }
+  const part = DB.parts.find(p => p.id === id);
+  if (!part) return;
+  part.balance += qty;
+  logUpdate({ category: 'spareparts', action: 'receive', pn: part.pn, boat: part.boat, qty, balance_after: part.balance, remarks });
+  filterPartDropdown('recv');
+  document.getElementById('sp-recv-qty').value = 1;
+  document.getElementById('sp-recv-remarks').value = '';
+  showToast(`📥 Received ${qty} × ${part.pn}. Balance: ${part.balance}`, 'success');
+  updateHomeCounts();
+}
+
+function renderPartsList() {
+  const q = (document.getElementById('sp-list-search')?.value || '').toLowerCase();
+  const list = document.getElementById('sp-parts-list');
+  const parts = DB.parts.filter(p => !q || p.pn.toLowerCase().includes(q) || (p.boat||'').toLowerCase().includes(q));
+  if (!parts.length) { list.innerHTML = '<div class="empty-state"><div class="icon">⚙️</div><p>No parts found</p></div>'; return; }
+  list.innerHTML = parts.map(p => `
+    <div class="history-item ${p.balance<=0?'pending':''}">
+      <div>
+        <div class="history-desc" style="font-family:monospace;font-size:13px">${p.pn}</div>
+        <div class="history-sub">${p.boat||''} · ${p.unit||'PCS'}</div>
+      </div>
+      <span class="badge ${p.balance<=0?'badge-oos':'badge-in-stock'}">Bal: ${p.balance}</span>
+    </div>`).join('');
+}
+
+
+// ═══════════════════════════════════════════
+// GUEST HOUSE (4 categories)
+// ═══════════════════════════════════════════
+let currentGHCat = 'Linen';
+let currentAdminGHCat = 'Linen';
+
+function switchGHTab(cat) {
+  currentGHCat = cat;
+  // update tab bar
+  document.querySelectorAll('#gh-tab-bar .tab-btn').forEach((btn, i) => {
+    const cats = ['Linen','Cutlery','Crockery','Kitchen Equipment','House Keeping'];
+    btn.classList.toggle('active', cats[i] === cat);
+  });
+  renderGHCategory();
+}
+
+function renderGHCategory() {
+  const cat = currentGHCat;
+  const items = (DB.ghCategories && DB.ghCategories[cat]) || [];
+  const body = document.getElementById('gh-category-body');
+  if (!items.length) {
+    body.innerHTML = '<div class="empty-state"><div class="icon">📦</div><p>No items yet — ask admin to add items to this category.</p></div>';
+    return;
+  }
+  body.innerHTML = items.map((item, idx) => `
+    <div class="card" style="margin-bottom:12px;padding:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="font-size:13px;font-weight:600;color:var(--dark)">${item.name}</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          ${item.price ? '<span style="font-size:12px;color:#888">₹'+item.price+'</span>' : ''}
+          <span class="badge badge-in-stock">On record: ${item.qty}</span>
+        </div>
+      </div>
+      <div class="inline-row" style="align-items:center">
+        <div class="form-group" style="margin-bottom:0;flex:1">
+          <label>Current Count</label>
+          <div class="qty-control">
+            <button onclick="adjustQty('gh-qty-${idx}',-1)">−</button>
+            <input type="number" id="gh-qty-${idx}" value="${item.qty}" min="0">
+            <button onclick="adjustQty('gh-qty-${idx}',1)">+</button>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="saveGHCount('${cat}',${idx})" style="margin-top:20px;white-space:nowrap">✅ Save</button>
+      </div>
+    </div>`).join('');
+}
+
+function saveGHCount(cat, idx) {
+  const items = DB.ghCategories[cat];
+  const newQty = parseInt(document.getElementById('gh-qty-' + idx).value) || 0;
+  const oldQty = items[idx].qty;
+  items[idx].qty = newQty;
+  logUpdate({ category: 'guesthouse', subtype: cat, item: items[idx].name, old_qty: oldQty, new_qty: newQty });
+  showToast('✅ ' + items[idx].name + ' updated to ' + newQty, 'success');
+  renderGHCategory();
+}
+
+// ── Admin GH ──────────────────────────────────────────────────────────────────
+function switchAdminGHTab(cat) {
+  currentAdminGHCat = cat;
+  document.getElementById('admin-gh-add-title').textContent = 'Add Item to ' + cat;
+  document.querySelectorAll('#admin-gh-tab-bar .tab-btn').forEach((btn, i) => {
+    const cats = ['Linen','Cutlery','Crockery','Kitchen Equipment','House Keeping'];
+    btn.classList.toggle('active', cats[i] === cat);
+  });
+  renderAdminGHTable();
+}
+
+function renderAdminGHTable() {
+  const cat = currentAdminGHCat;
+  const items = (DB.ghCategories && DB.ghCategories[cat]) || [];
+  const tbody = document.getElementById('admin-gh-tbody');
+  if (!items.length) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#aaa;padding:16px">No items yet</td></tr>';
+    return;
+  }
+  tbody.innerHTML = items.map((item, i) => `
+    <tr id="gh-row-${i}">
+      <td>
+        <span id="gh-name-display-${i}" style="font-weight:500">${item.name}</span>
+        <input type="text" id="gh-name-edit-${i}" value="${item.name}"
+          style="display:none;width:100%;padding:5px 8px;border:1.5px solid var(--teal);border-radius:5px;font-size:13px">
+      </td>
+      <td>
+        <span id="gh-qty-display-${i}">${item.qty}</span>
+        <input type="number" id="gh-qty-edit-${i}" value="${item.qty}" min="0"
+          style="display:none;width:70px;padding:5px 8px;border:1.5px solid var(--teal);border-radius:5px;font-size:13px">
+      </td>
+      <td>
+        <span id="gh-price-display-${i}">${item.price ? '₹'+item.price : '—'}</span>
+        <input type="number" id="gh-price-edit-${i}" value="${item.price||0}" min="0"
+          style="display:none;width:80px;padding:5px 8px;border:1.5px solid var(--teal);border-radius:5px;font-size:13px">
+      </td>
+      <td style="white-space:nowrap">
+        <button class="btn-icon" id="gh-edit-btn-${i}" onclick="startEditGH(${i})" title="Edit">✏️</button>
+        <button class="btn-icon" id="gh-save-btn-${i}" onclick="saveEditGH(${i})" title="Save" style="display:none;color:var(--green)">💾</button>
+        <button class="btn-icon" id="gh-cancel-btn-${i}" onclick="cancelEditGH(${i})" title="Cancel" style="display:none">✕</button>
+        <button class="btn-icon" onclick="deleteGHItem(${i})" title="Delete">🗑️</button>
+      </td>
+    </tr>`).join('');
+}
+
+function startEditGH(i) {
+  ['name','qty','price'].forEach(f => {
+    document.getElementById('gh-'+f+'-display-'+i).style.display = 'none';
+    document.getElementById('gh-'+f+'-edit-'+i).style.display = 'inline-block';
+  });
+  document.getElementById('gh-edit-btn-'+i).style.display = 'none';
+  document.getElementById('gh-save-btn-'+i).style.display = 'inline-block';
+  document.getElementById('gh-cancel-btn-'+i).style.display = 'inline-block';
+}
+
+function cancelEditGH(i) {
+  ['name','qty','price'].forEach(f => {
+    document.getElementById('gh-'+f+'-display-'+i).style.display = '';
+    document.getElementById('gh-'+f+'-edit-'+i).style.display = 'none';
+  });
+  document.getElementById('gh-edit-btn-'+i).style.display = '';
+  document.getElementById('gh-save-btn-'+i).style.display = 'none';
+  document.getElementById('gh-cancel-btn-'+i).style.display = 'none';
+}
+
+function saveEditGH(i) {
+  const cat = currentAdminGHCat;
+  const items = DB.ghCategories[cat];
+  const newName = document.getElementById('gh-name-edit-'+i).value.trim().toUpperCase();
+  const newQty = parseInt(document.getElementById('gh-qty-edit-'+i).value) || 0;
+  const newPrice = parseFloat(document.getElementById('gh-price-edit-'+i).value) || 0;
+  if (!newName) { showToast('Item name cannot be empty', 'error'); return; }
+  items[i].name = newName;
+  items[i].qty = newQty;
+  items[i].price = newPrice;
+  saveDB();
+  renderAdminGHTable();
+  showToast('✅ Item updated', 'success');
+}
+
+function addGHItem() {
+  const cat = currentAdminGHCat;
+  const name = document.getElementById('admin-gh-new-name').value.trim().toUpperCase();
+  const qty = parseInt(document.getElementById('admin-gh-new-qty').value) || 0;
+  const price = parseFloat(document.getElementById('admin-gh-new-price').value) || 0;
+  if (!name) { showToast('Item name is required', 'error'); return; }
+  if (!DB.ghCategories[cat]) DB.ghCategories[cat] = [];
+  const id = cat.replace(/\s/g,'_') + '_' + Date.now();
+  DB.ghCategories[cat].push({ id, name, qty, price });
+  saveDB();
+  renderAdminGHTable();
+  renderGHCategory();
+  document.getElementById('admin-gh-new-name').value = '';
+  document.getElementById('admin-gh-new-qty').value = 0;
+  document.getElementById('admin-gh-new-price').value = 0;
+  showToast('✅ Added ' + name + ' to ' + cat, 'success');
+}
+
+function deleteGHItem(i) {
+  const cat = currentAdminGHCat;
+  const item = DB.ghCategories[cat][i];
+  if (!confirm('Delete "' + item.name + '"?')) return;
+  DB.ghCategories[cat].splice(i, 1);
+  saveDB();
+  renderAdminGHTable();
+  renderGHCategory();
+  showToast('Deleted', 'success');
+}
+
+// ═══════════════════════════════════════════
+// TACKLE
+// ═══════════════════════════════════════════
+function populateTackleSelects() {
+  const catSel = document.getElementById('tk-cat-select');
+  catSel.innerHTML = DB.tackle_cats.map(c => `<option>${c}</option>`).join('');
+  filterTackleItems();
+  const adminCatSel = document.getElementById('new-tk-cat');
+  if (adminCatSel) adminCatSel.innerHTML = DB.tackle_cats.map(c => `<option>${c}</option>`).join('');
+}
+
+function filterTackleItems() {
+  const cat = document.getElementById('tk-cat-select').value;
+  const sel = document.getElementById('tk-item-select');
+  const items = DB.tackle_items.filter(x => x.cat === cat);
+  sel.innerHTML = items.length ? items.map(x => `<option value="${x.id}">${x.desc}</option>`).join('') : '<option value="">No items in this category</option>';
+  loadTackleQty();
+}
+
+function loadTackleQty() {
+  const id = document.getElementById('tk-item-select').value;
+  const item = DB.tackle_items.find(x => x.id === id);
+  const el = document.getElementById('tk-current-qty');
+  if (item) { el.textContent = `${item.qty} units`; document.getElementById('tk-new-qty').value = item.qty; }
+  else { el.textContent = '—'; }
+}
+
+function submitTackle() {
+  const id = document.getElementById('tk-item-select').value;
+  const newQty = parseInt(document.getElementById('tk-new-qty').value) || 0;
+  const notes = document.getElementById('tk-notes').value.trim();
+  const item = DB.tackle_items.find(x => x.id === id);
+  if (!item) { showToast('Select an item first', 'error'); return; }
+  const oldQty = item.qty;
+  item.qty = newQty;
+  logUpdate({ category: 'tackle', cat: item.cat, desc: item.desc, old_qty: oldQty, new_qty: newQty, notes });
+  loadTackleQty();
+  document.getElementById('tk-notes').value = '';
+  showToast(`✅ ${item.desc} updated to ${newQty}`, 'success');
+}
+
+function renderTackleList() {
+  const list = document.getElementById('tk-items-list');
+  list.innerHTML = DB.tackle_cats.map(cat => {
+    const items = DB.tackle_items.filter(x => x.cat === cat);
+    if (!items.length) return `<div class="card"><div class="card-title">${cat}</div><p style="color:#aaa;font-size:13px">No items added yet</p></div>`;
+    return `<div class="card"><div class="card-title">${cat}</div>` +
+      items.map(x => `<div class="history-item" style="margin-bottom:8px">
+        <div><div class="history-desc">${x.desc}</div></div>
+        <span class="badge ${x.qty>0?'badge-in-stock':'badge-oos'}">${x.qty} units</span>
+      </div>`).join('') + '</div>';
+  }).join('');
+}
+
+// ═══════════════════════════════════════════
+// LOGIN / SESSION
+// ═══════════════════════════════════════════
+function switchLoginTab(tab) {
+  document.getElementById('ltab-staff').classList.toggle('active', tab === 'staff');
+  document.getElementById('ltab-admin').classList.toggle('active', tab === 'admin');
+  document.getElementById('lsec-staff').style.display = tab === 'staff' ? '' : 'none';
+  document.getElementById('lsec-admin').style.display = tab === 'admin' ? '' : 'none';
+  document.getElementById('staff-login-err').style.display = 'none';
+  document.getElementById('admin-login-err').style.display = 'none';
+  if (tab === 'admin') populateAdminLoginDropdown();
+}
+
+function populateStaffLoginDropdown() {
+  const sel = document.getElementById('staff-login-name');
+  const users = DB.staffUsers || [];
+  sel.innerHTML = '<option value="">— Choose name —</option>' +
+    users.map(u => `<option value="${u.id}">${u.name}</option>`).join('');
+}
+
+function populateAdminLoginDropdown() {
+  const sel = document.getElementById('admin-login-who');
+  const admins = DB.admins || [];
+  sel.innerHTML = '<option value="">— Choose account —</option>' +
+    '<option value="__superadmin__">🔑 Super Admin (Darran)</option>' +
+    admins.map(a => `<option value="${a.id}">⚙️ ${a.name}</option>`).join('');
+}
+
+function doStaffLogin() {
+  const sel   = document.getElementById('staff-login-name');
+  const pw    = document.getElementById('staff-login-pw').value;
+  const errEl = document.getElementById('staff-login-err');
+  const uid   = sel.value;
+  if (!uid) { errEl.textContent = 'Please select your name.'; errEl.style.display = 'block'; return; }
+  const user = (DB.staffUsers || []).find(u => String(u.id) === String(uid));
+  if (!user || user.password !== pw) {
+    errEl.textContent = 'Incorrect password. Try again.';
+    errEl.style.display = 'block';
+    document.getElementById('staff-login-pw').value = '';
+    document.getElementById('staff-login-pw').focus();
+    return;
+  }
+  currentUser = { name: user.name, role: 'staff' };
+  onLoginSuccess();
+}
+
+function doAdminLogin() {
+  const who   = document.getElementById('admin-login-who').value;
+  const pw    = document.getElementById('admin-pw-input').value;
+  const errEl = document.getElementById('admin-login-err');
+  errEl.style.display = 'none';
+
+  if (!who) {
+    errEl.textContent = 'Please select an account.';
+    errEl.style.display = 'block'; return;
+  }
+
+  if (who === '__superadmin__') {
+    if (pw !== DB.superAdminPw) {
+      errEl.textContent = 'Incorrect password. Try again.';
+      errEl.style.display = 'block';
+      document.getElementById('admin-pw-input').value = '';
+      document.getElementById('admin-pw-input').focus();
+      return;
+    }
+    currentUser = { name: 'Super Admin', role: 'superadmin' };
+  } else {
+    const acc = (DB.admins || []).find(a => String(a.id) === String(who));
+    if (!acc || pw !== acc.password) {
+      errEl.textContent = 'Incorrect password. Try again.';
+      errEl.style.display = 'block';
+      document.getElementById('admin-pw-input').value = '';
+      document.getElementById('admin-pw-input').focus();
+      return;
+    }
+    currentUser = { name: acc.name, role: 'admin' };
+  }
+
+  document.getElementById('admin-pw-input').value = '';
+  onLoginSuccess();
+  enterAdmin();
+}
+
+function onLoginSuccess() {
+  document.getElementById('login-overlay').classList.add('hidden');
+  document.getElementById('staff-login-pw').value = '';
+  document.getElementById('staff-interface').style.display = 'block';
+  // Show user badge with role icon
+  document.getElementById('user-badge').style.display = 'flex';
+  const icon = currentUser.role === 'superadmin' ? '🔑 ' : currentUser.role === 'admin' ? '⚙️ ' : '👤 ';
+  document.getElementById('user-badge-name').textContent = icon + currentUser.name;
+  // Show admin button for admin and superadmin
+  document.getElementById('admin-toggle-btn').style.display =
+    (currentUser.role === 'admin' || currentUser.role === 'superadmin') ? '' : 'none';
+  updateHomeCounts();
+}
+
+function doLogout() {
+  currentUser = null;
+  adminUnlocked = false;
+  // Hide everything, reset UI
+  document.getElementById('staff-interface').style.display = 'none';
+  document.getElementById('admin-panel').classList.remove('active');
+  document.getElementById('admin-toggle-btn').textContent = '⚙️ Admin';
+  document.getElementById('admin-toggle-btn').classList.remove('active');
+  document.getElementById('admin-toggle-btn').style.display = 'none';
+  document.getElementById('user-badge').style.display = 'none';
+  // Reset login form and show screen
+  document.getElementById('staff-login-pw').value = '';
+  document.getElementById('admin-pw-input').value = '';
+  document.getElementById('admin-login-who').value = '';
+  document.getElementById('staff-login-err').style.display = 'none';
+  document.getElementById('admin-login-err').style.display = 'none';
+  switchLoginTab('staff');
+  populateStaffLoginDropdown();
+  document.getElementById('login-overlay').classList.remove('hidden');
+}
+
+// ═══════════════════════════════════════════
+// ADMIN PANEL
+// ═══════════════════════════════════════════
+function toggleAdmin() {
+  if (adminUnlocked) { exitAdmin(); return; }
+  // Already authenticated as admin or superadmin — go straight in
+  if (currentUser && (currentUser.role === 'admin' || currentUser.role === 'superadmin')) {
+    enterAdmin(); return;
+  }
+}
+
+function enterAdmin() {
+  adminUnlocked = true;
+  document.getElementById('staff-interface').style.display = 'none';
+  document.getElementById('admin-panel').classList.add('active');
+  document.getElementById('admin-toggle-btn').textContent = '✕ Exit Admin';
+  document.getElementById('admin-toggle-btn').classList.add('active');
+  renderAdminAll();
+}
+
+function exitAdmin() {
+  adminUnlocked = false;
+  document.getElementById('staff-interface').style.display = 'block';
+  document.getElementById('admin-panel').classList.remove('active');
+  document.getElementById('admin-toggle-btn').textContent = '⚙️ Admin';
+  document.getElementById('admin-toggle-btn').classList.remove('active');
+  goHome();
+}
+
+// ═══════════════════════════════════════════
+// STAFF USER MANAGEMENT
+// ═══════════════════════════════════════════
+function renderStaffUsersAdmin() {
+  const users = DB.staffUsers || [];
+  const el = document.getElementById('staff-users-list');
+  if (!users.length) {
+    el.innerHTML = '<p style="font-size:13px;color:#aaa;text-align:center;padding:10px">No staff accounts yet.</p>';
+    return;
+  }
+  el.innerHTML = `<table class="admin-table" style="margin-top:8px">
+    <thead><tr><th>#</th><th>Name</th><th>Password</th><th></th></tr></thead>
+    <tbody>${users.map((u, i) => `
+      <tr>
+        <td style="color:#aaa;font-size:12px">${i + 1}</td>
+        <td style="font-weight:500">${u.name}</td>
+        <td style="font-size:12px;color:#999;letter-spacing:2px">••••••</td>
+        <td><button class="btn-icon" onclick="deleteStaffUser(${u.id})" title="Remove">🗑️</button></td>
+      </tr>`).join('')}
+    </tbody>
+  </table>`;
+}
+
+function addStaffUser() {
+  const name = document.getElementById('new-staff-name').value.trim();
+  const pw   = document.getElementById('new-staff-pw').value;
+  if (!name) { showToast('Please enter a name', 'error'); return; }
+  if (!pw || pw.length < 4) { showToast('Password must be at least 4 characters', 'error'); return; }
+  if (!DB.staffUsers) DB.staffUsers = [];
+  if (DB.staffUsers.find(u => u.name.toLowerCase() === name.toLowerCase())) {
+    showToast('A staff member with that name already exists', 'error'); return;
+  }
+  DB.staffUsers.push({ id: Date.now(), name, password: pw });
+  saveDB();
+  renderStaffUsersAdmin();
+  document.getElementById('new-staff-name').value = '';
+  document.getElementById('new-staff-pw').value = '';
+  showToast(`✅ Added staff account for ${name}`, 'success');
+}
+
+function deleteStaffUser(id) {
+  const user = (DB.staffUsers || []).find(u => u.id === id);
+  if (!user) return;
+  if (!confirm(`Remove staff account for "${user.name}"?`)) return;
+  DB.staffUsers = DB.staffUsers.filter(u => u.id !== id);
+  saveDB();
+  renderStaffUsersAdmin();
+  showToast(`Removed ${user.name}`, 'success');
+}
+
+// ═══════════════════════════════════════════
+// ADMIN ACCOUNT MANAGEMENT (Super Admin only)
+// ═══════════════════════════════════════════
+function renderAdminAccountsSection() {
+  const admins = DB.admins || [];
+  const el = document.getElementById('admin-accounts-list');
+  if (!admins.length) {
+    el.innerHTML = '<p style="font-size:13px;color:#aaa;text-align:center;padding:10px">No admin accounts yet. Add one above.</p>';
+    return;
+  }
+  el.innerHTML = `<table class="admin-table" style="margin-top:8px">
+    <thead><tr><th>#</th><th>Name</th><th>Password</th><th></th></tr></thead>
+    <tbody>${admins.map((a, i) => `
+      <tr>
+        <td style="color:#aaa;font-size:12px">${i + 1}</td>
+        <td style="font-weight:500">${a.name}</td>
+        <td style="font-size:12px;color:#999;letter-spacing:2px">••••••</td>
+        <td><button class="btn-icon" onclick="deleteAdminAccount(${a.id})" title="Remove">🗑️</button></td>
+      </tr>`).join('')}
+    </tbody>
+  </table>`;
+}
+
+function addAdminAccount() {
+  if (currentUser?.role !== 'superadmin') { showToast('Only Super Admin can add admin accounts', 'error'); return; }
+  const name = document.getElementById('new-admin-name').value.trim();
+  const pw   = document.getElementById('new-admin-pw').value;
+  if (!name) { showToast('Please enter a name', 'error'); return; }
+  if (!pw || pw.length < 4) { showToast('Password must be at least 4 characters', 'error'); return; }
+  if (!DB.admins) DB.admins = [];
+  if (DB.admins.find(a => a.name.toLowerCase() === name.toLowerCase())) {
+    showToast('An admin with that name already exists', 'error'); return;
+  }
+  DB.admins.push({ id: Date.now(), name, password: pw });
+  saveDB();
+  renderAdminAccountsSection();
+  populateAdminLoginDropdown();
+  document.getElementById('new-admin-name').value = '';
+  document.getElementById('new-admin-pw').value = '';
+  showToast(`✅ Added admin account for ${name}`, 'success');
+}
+
+function deleteAdminAccount(id) {
+  if (currentUser?.role !== 'superadmin') { showToast('Only Super Admin can delete admin accounts', 'error'); return; }
+  const acc = (DB.admins || []).find(a => a.id === id);
+  if (!acc) return;
+  if (!confirm(`Remove admin account for "${acc.name}"?`)) return;
+  DB.admins = DB.admins.filter(a => a.id !== id);
+  saveDB();
+  renderAdminAccountsSection();
+  populateAdminLoginDropdown();
+  showToast(`Removed ${acc.name}`, 'success');
+}
+
+function showAdminTab(name) {
+  document.querySelectorAll('[id^="admin-tab-"]').forEach(el => el.style.display = 'none');
+  const el = document.getElementById('admin-tab-' + name);
+  if (el) el.style.display = 'block';
+  document.querySelectorAll('.admin-nav').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('onclick')?.includes("'" + name + "'"));
+  });
+  if (name === 'updates') renderAdminUpdates();
+  if (name === 'assets') renderAdminAssets();
+  if (name === 'parts') renderAdminParts();
+  if (name === 'gh') { switchAdminGHTab('Linen'); }
+  if (name === 'tackle') { renderAdminTackle(); populateTackleSelects(); }
+  if (name === 'settings') {
+    renderStaffUsersAdmin();
+    const isSA = currentUser && currentUser.role === 'superadmin';
+    document.getElementById('admin-accounts-card').style.display = isSA ? '' : 'none';
+    document.getElementById('reset-btn-wrapper').style.display   = isSA ? '' : 'none';
+    document.getElementById('pw-card-title').textContent = isSA ? 'Change Super Admin Password' : 'Change My Password';
+    if (isSA) renderAdminAccountsSection();
+  }
+}
+
+function renderAdminAll() {
+  renderAdminUpdates();
+  renderAdminAssets();
+  renderAdminParts();
+  switchAdminGHTab('Linen');
+  renderAdminTackle();
+}
+
+function renderAdminUpdates() {
+  const filter = document.getElementById('admin-filter-type')?.value || '';
+  let items = filter ? DB.updates.filter(u => u.category === filter) : DB.updates;
+  const list = document.getElementById('admin-updates-list');
+  if (!items.length) { list.innerHTML = '<div class="empty-state"><div class="icon">📋</div><p>No updates logged yet</p></div>'; return; }
+  list.innerHTML = `<div style="overflow-x:auto"><table class="admin-table">
+    <thead><tr><th>Time</th><th>By</th><th>Category</th><th>Details</th><th></th></tr></thead>
+    <tbody>${items.slice(0,100).map(u => {
+      let detail = '';
+      if (u.category==='maintenance') detail = `<strong>${u.asset}</strong> — ${u.desc?.substring(0,50)} <span class="badge badge-${u.status==='COMPLETED'?'completed':'pending'}">${u.status}</span>`;
+      else if (u.category==='spareparts') detail = `<strong>${u.pn}</strong> ${u.action==='issue'?'issued':'received'} ${u.qty} (bal: ${u.balance_after})`;
+      else if (u.category==='guesthouse') detail = `<strong>${u.item}</strong> ${u.old_qty} → ${u.new_qty}`;
+      else if (u.category==='tackle') detail = `<strong>${u.desc}</strong> ${u.old_qty} → ${u.new_qty}`;
+      const ts = new Date(u.ts).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+      const byLabel = u.by || '—';
+      return `<tr>
+        <td style="white-space:nowrap;font-size:12px;color:#888">${ts}</td>
+        <td style="font-size:12px;font-weight:600;color:var(--navy);white-space:nowrap">${byLabel}</td>
+        <td><span class="tag">${u.category}</span></td>
+        <td style="font-size:13px">${detail}</td>
+        <td><button class="btn-icon" onclick="deleteUpdate(${u.id})">🗑️</button></td>
+      </tr>`;
+    }).join('')}</tbody></table></div>`;
+}
+
+const ASSET_INPUT_STYLE = 'width:100%;padding:4px 7px;border:1.5px solid var(--teal);border-radius:5px;font-size:12px;box-sizing:border-box';
+
+function renderAdminAssets() {
+  const tbody = document.getElementById('assets-tbody');
+  tbody.innerHTML = DB.boats.map((b, i) => {
+    const catOpts  = ASSET_CATS.map(c => `<option${c === (b.category||'') ? ' selected' : ''}>${c}</option>`).join('');
+    const reaOpts  = ['Sold','Scrapped','Broken','Other'].map(r => `<option${r === (b.reason||'') ? ' selected' : ''}>${r}</option>`).join('');
+    const removedStyle = b.removedDate ? 'background:#fff5f5' : '';
+    return `
+    <tr id="asset-row-${i}" style="${removedStyle}">
+      <td style="color:#aaa;font-size:12px;width:28px">${i + 1}</td>
+      <td style="min-width:120px">
+        <span id="asset-name-d-${i}" style="font-weight:500">${b.name}</span>
+        <input type="text" id="asset-name-e-${i}" value="${b.name}" style="display:none;${ASSET_INPUT_STYLE}"
+          onkeydown="if(event.key==='Enter') saveEditAsset(${i}); if(event.key==='Escape') cancelEditAsset(${i})">
+      </td>
+      <td style="min-width:140px">
+        <span id="asset-cat-d-${i}" style="font-size:12px;color:#555">${b.category||'—'}</span>
+        <select id="asset-cat-e-${i}" style="display:none;${ASSET_INPUT_STYLE}">${catOpts}</select>
+      </td>
+      <td style="min-width:100px;white-space:nowrap">
+        <span id="asset-pdate-d-${i}" style="font-size:12px">${fmtDate(b.purchaseDate)}</span>
+        <input type="date" id="asset-pdate-e-${i}" value="${b.purchaseDate||''}" style="display:none;${ASSET_INPUT_STYLE}">
+      </td>
+      <td style="min-width:90px;text-align:right">
+        <span id="asset-pprice-d-${i}" style="font-size:12px">${fmtRupees(b.purchasePrice)}</span>
+        <input type="number" id="asset-pprice-e-${i}" value="${b.purchasePrice||''}" min="0" placeholder="0" style="display:none;${ASSET_INPUT_STYLE};text-align:right">
+      </td>
+      <td style="min-width:100px;white-space:nowrap">
+        <span id="asset-rdate-d-${i}" style="font-size:12px${b.removedDate ? ';color:var(--red)' : ''}">${fmtDate(b.removedDate)}</span>
+        <input type="date" id="asset-rdate-e-${i}" value="${b.removedDate||''}" style="display:none;${ASSET_INPUT_STYLE}">
+      </td>
+      <td style="min-width:90px">
+        <span id="asset-reason-d-${i}" style="font-size:12px${b.reason ? ';color:var(--red)' : ''}">${b.reason||'—'}</span>
+        <select id="asset-reason-e-${i}" style="display:none;${ASSET_INPUT_STYLE}">
+          <option value="">—</option>${reaOpts}
+        </select>
+      </td>
+      <td style="white-space:nowrap">
+        <button class="btn-icon" id="asset-edit-btn-${i}"   onclick="startEditAsset(${i})"   title="Edit">✏️</button>
+        <button class="btn-icon" id="asset-save-btn-${i}"   onclick="saveEditAsset(${i})"    title="Save"  style="display:none;color:var(--green)">💾</button>
+        <button class="btn-icon" id="asset-cancel-btn-${i}" onclick="cancelEditAsset(${i})"  title="Cancel" style="display:none">✕</button>
+        <button class="btn-icon" onclick="deleteAsset(${i})" title="Delete">🗑️</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+const ASSET_FIELDS = ['name','cat','pdate','pprice','rdate','reason'];
+
+function _assetToggle(i, editMode) {
+  ASSET_FIELDS.forEach(f => {
+    const d = document.getElementById(`asset-${f}-d-${i}`);
+    const e = document.getElementById(`asset-${f}-e-${i}`);
+    if (d) d.style.display = editMode ? 'none' : '';
+    if (e) e.style.display = editMode ? (f === 'name' ? 'inline-block' : 'inline-block') : 'none';
+  });
+  document.getElementById(`asset-edit-btn-${i}`).style.display   = editMode ? 'none'         : 'inline-block';
+  document.getElementById(`asset-save-btn-${i}`).style.display   = editMode ? 'inline-block' : 'none';
+  document.getElementById(`asset-cancel-btn-${i}`).style.display = editMode ? 'inline-block' : 'none';
+}
+
+function startEditAsset(i) {
+  _assetToggle(i, true);
+  const input = document.getElementById(`asset-name-e-${i}`);
+  input.focus(); input.select();
+}
+
+function cancelEditAsset(i) {
+  const b = DB.boats[i];
+  document.getElementById(`asset-name-e-${i}`).value   = b.name;
+  document.getElementById(`asset-pdate-e-${i}`).value  = b.purchaseDate  || '';
+  document.getElementById(`asset-pprice-e-${i}`).value = b.purchasePrice !== undefined ? b.purchasePrice : '';
+  document.getElementById(`asset-rdate-e-${i}`).value  = b.removedDate   || '';
+  document.getElementById(`asset-reason-e-${i}`).value = b.reason        || '';
+  _assetToggle(i, false);
+}
+
+function saveEditAsset(i) {
+  const newName   = document.getElementById(`asset-name-e-${i}`).value.trim().toUpperCase();
+  const newCat    = document.getElementById(`asset-cat-e-${i}`).value;
+  const newPDate  = document.getElementById(`asset-pdate-e-${i}`).value;
+  const newPPrice = document.getElementById(`asset-pprice-e-${i}`).value;
+  const newRDate  = document.getElementById(`asset-rdate-e-${i}`).value;
+  const newReason = document.getElementById(`asset-reason-e-${i}`).value;
+  if (!newName) { showToast('Asset name cannot be empty', 'error'); return; }
+  const dup = DB.boats.findIndex((b, idx) => idx !== i && b.name === newName);
+  if (dup !== -1) { showToast(`"${newName}" already exists`, 'error'); return; }
+  const b = DB.boats[i];
+  b.name          = newName;
+  b.category      = newCat;
+  b.purchaseDate  = newPDate  || '';
+  b.purchasePrice = newPPrice !== '' ? Number(newPPrice) : '';
+  b.removedDate   = newRDate  || '';
+  b.reason        = newReason || '';
+  saveDB();
+  // Update display cells in-place
+  document.getElementById(`asset-name-d-${i}`).textContent   = newName;
+  document.getElementById(`asset-cat-d-${i}`).textContent    = newCat  || '—';
+  document.getElementById(`asset-pdate-d-${i}`).textContent  = fmtDate(newPDate);
+  document.getElementById(`asset-pprice-d-${i}`).textContent = fmtRupees(b.purchasePrice);
+  const rdEl = document.getElementById(`asset-rdate-d-${i}`);
+  rdEl.textContent  = fmtDate(newRDate);
+  rdEl.style.color  = newRDate ? 'var(--red)' : '';
+  const reEl = document.getElementById(`asset-reason-d-${i}`);
+  reEl.textContent  = newReason || '—';
+  reEl.style.color  = newReason ? 'var(--red)' : '';
+  // Highlight row if removed
+  document.getElementById(`asset-row-${i}`).style.background = newRDate ? '#fff5f5' : '';
+  _assetToggle(i, false);
+  showToast(`✅ Asset saved`, 'success');
+}
+
+function addAsset() {
+  const name   = document.getElementById('new-asset-name').value.trim().toUpperCase();
+  const cat    = document.getElementById('new-asset-cat').value;
+  const pdate  = document.getElementById('new-asset-pdate').value;
+  const pprice = document.getElementById('new-asset-pprice').value;
+  const rdate  = document.getElementById('new-asset-rdate').value;
+  const reason = document.getElementById('new-asset-reason').value;
+  if (!name) { showToast('Please enter an asset name', 'error'); return; }
+  if (!cat)  { showToast('Please select a category', 'error'); return; }
+  if (DB.boats.find(b => b.name === name)) { showToast('Asset already exists', 'error'); return; }
+  DB.boats.push({
+    name, category: cat,
+    purchaseDate:  pdate  || '',
+    purchasePrice: pprice !== '' ? Number(pprice) : '',
+    removedDate:   rdate  || '',
+    reason:        reason || ''
+  });
+  saveDB(); renderAdminAssets();
+  ['new-asset-name','new-asset-cat','new-asset-pdate','new-asset-pprice','new-asset-rdate','new-asset-reason']
+    .forEach(id => { document.getElementById(id).value = ''; });
+  showToast(`✅ Added ${name} (${cat})`, 'success');
+}
+
+function deleteAsset(i) {
+  if (!confirm(`Delete "${DB.boats[i].name}"?`)) return;
+  DB.boats.splice(i, 1);
+  saveDB(); renderAdminAssets();
+  showToast('Asset deleted', 'success');
+}
+
+const PART_CATS = [
+  'Yamaha F250/F200 BET',
+  'Yamaha F250GET',
+  'Suzuki 200HP',
+  'Suzuki 250HP',
+  'Other Boat Spares',
+  'Fishing Equipment Spares'
+];
+const PART_INPUT_STYLE = 'padding:4px 7px;border:1.5px solid var(--teal);border-radius:5px;font-size:12px';
+
+function renderAdminParts() {
+  const q = (document.getElementById('admin-parts-search')?.value || '').toLowerCase();
+  // Preserve DB index so edit functions always hit the right record
+  const parts = DB.parts
+    .map((p, dbIdx) => ({ ...p, _dbIdx: dbIdx }))
+    .filter(p => !q || p.pn.toLowerCase().includes(q) || (p.boat||'').toLowerCase().includes(q));
+  const tbody = document.getElementById('admin-parts-tbody');
+  tbody.innerHTML = parts.map(p => {
+    const i = p._dbIdx;
+    const opts = PART_CATS.map(c => `<option${c === (p.boat||'') ? ' selected' : ''}>${c}</option>`).join('');
+    return `<tr>
+      <td class="mono" style="font-size:12px">${p.pn}</td>
+      <td style="min-width:160px">
+        <span id="pcat-d-${i}" style="font-size:12px">${p.boat||'—'}</span>
+        <select id="pcat-e-${i}" style="display:none;${PART_INPUT_STYLE}">
+          <option value="">— Select —</option>${opts}
+        </select>
+      </td>
+      <td style="font-size:12px">${p.unit||'PCS'}</td>
+      <td><input type="number" value="${p.balance}" min="0"
+        style="width:70px;padding:4px 8px;border:1px solid #ddd;border-radius:4px"
+        onchange="updatePartBalanceAdmin('${p.id}',this.value)"></td>
+      <td style="white-space:nowrap">
+        <button class="btn-icon" id="pcat-edit-btn-${i}" onclick="startEditPart(${i})" title="Edit category">✏️</button>
+        <button class="btn-icon" id="pcat-save-btn-${i}" onclick="saveEditPart(${i})"  title="Save" style="display:none;color:var(--green)">💾</button>
+        <button class="btn-icon" id="pcat-cancel-btn-${i}" onclick="cancelEditPart(${i})" title="Cancel" style="display:none">✕</button>
+        <button class="btn-icon" onclick="deletePart('${p.id}')">🗑️</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function startEditPart(i) {
+  document.getElementById(`pcat-d-${i}`).style.display        = 'none';
+  document.getElementById(`pcat-e-${i}`).style.display        = 'inline-block';
+  document.getElementById(`pcat-edit-btn-${i}`).style.display = 'none';
+  document.getElementById(`pcat-save-btn-${i}`).style.display = 'inline-block';
+  document.getElementById(`pcat-cancel-btn-${i}`).style.display = 'inline-block';
+  document.getElementById(`pcat-e-${i}`).focus();
+}
+
+function cancelEditPart(i) {
+  document.getElementById(`pcat-d-${i}`).style.display        = '';
+  document.getElementById(`pcat-e-${i}`).style.display        = 'none';
+  document.getElementById(`pcat-edit-btn-${i}`).style.display = 'inline-block';
+  document.getElementById(`pcat-save-btn-${i}`).style.display = 'none';
+  document.getElementById(`pcat-cancel-btn-${i}`).style.display = 'none';
+}
+
+function saveEditPart(i) {
+  const newCat = document.getElementById(`pcat-e-${i}`).value;
+  if (!newCat) { showToast('Please select a category', 'error'); return; }
+  DB.parts[i].boat = newCat;
+  saveDB();
+  document.getElementById(`pcat-d-${i}`).textContent = newCat;
+  cancelEditPart(i);
+  showToast('✅ Category updated', 'success');
+}
+
+function updatePartBalanceAdmin(id, val) {
+  const p = DB.parts.find(x => x.id === id);
+  if (p) { p.balance = parseInt(val) || 0; saveDB(); updateHomeCounts(); }
+}
+
+function addPart() {
+  const pn = document.getElementById('new-part-pn').value.trim();
+  const boat = document.getElementById('new-part-boat').value.trim();
+  const unit = document.getElementById('new-part-unit').value.trim() || 'PCS';
+  const bal = parseInt(document.getElementById('new-part-bal').value) || 0;
+  if (!pn) { showToast('Part number is required', 'error'); return; }
+  if (DB.parts.find(p => p.id === pn)) { showToast('Part number already exists', 'error'); return; }
+  DB.parts.push({ id: pn, pn, boat, unit, balance: bal });
+  saveDB(); renderAdminParts();
+  document.getElementById('new-part-pn').value   = '';
+  document.getElementById('new-part-boat').value = '';
+  document.getElementById('new-part-bal').value  = 0;
+  showToast(`✅ Added part ${pn}`, 'success');
+}
+
+function deletePart(id) {
+  if (!confirm('Delete this part?')) return;
+  DB.parts = DB.parts.filter(p => p.id !== id);
+  saveDB(); renderAdminParts(); updateHomeCounts();
+  showToast('Part deleted', 'success');
+}
+
+// (renderAdminGH, addGHItem, deleteGHItem moved to Guest House section above)
+
+function calcSalesPrice(price, markup) {
+  const p = parseFloat(price) || 0;
+  const m = parseFloat(markup) || 0;
+  return Math.round(p * (1 + m / 100));
+}
+
+function previewTkSalesPrice() {
+  const price  = parseFloat(document.getElementById('new-tk-price').value)  || 0;
+  const markup = parseFloat(document.getElementById('new-tk-markup').value) || 0;
+  document.getElementById('new-tk-sales-preview').textContent = calcSalesPrice(price, markup);
+}
+
+function renderAdminTackle() {
+  const q = (document.getElementById('admin-tk-search')?.value || '').toLowerCase();
+  const items = DB.tackle_items.filter(x => !q || x.desc.toLowerCase().includes(q) || x.cat.toLowerCase().includes(q));
+  const tbody = document.getElementById('admin-tk-tbody');
+  const catOpts = DB.tackle_cats.map(c => `<option value="${c}">${c}</option>`).join('');
+  tbody.innerHTML = items.map((x) => {
+    const salesPrice = calcSalesPrice(x.price, x.markup);
+    const safeId = x.id;
+    return `
+    <tr id="tk-row-${safeId}">
+      <!-- DISPLAY MODE -->
+      <td id="tk-cat-d-${safeId}"><span class="tag">${x.cat}</span></td>
+      <td id="tk-desc-d-${safeId}" style="font-size:13px">${x.desc}</td>
+      <td id="tk-qty-d-${safeId}">${x.qty}</td>
+      <td id="tk-price-d-${safeId}">₹${x.price || 0}</td>
+      <td id="tk-markup-d-${safeId}">${x.markup || 0}%</td>
+      <td id="tk-sales-d-${safeId}" style="font-weight:700;color:var(--teal)">${salesPrice}</td>
+      <!-- EDIT MODE (hidden) -->
+      <td id="tk-cat-e-${safeId}" style="display:none">
+        <select style="padding:4px 6px;border:1.5px solid var(--teal);border-radius:5px;font-size:12px"
+          id="tk-cat-input-${safeId}">${catOpts.replace(`value="${x.cat}"`,`value="${x.cat}" selected`)}</select>
+      </td>
+      <td id="tk-desc-e-${safeId}" style="display:none">
+        <input type="text" id="tk-desc-input-${safeId}" value="${x.desc}"
+          style="width:140px;padding:4px 8px;border:1.5px solid var(--teal);border-radius:5px;font-size:13px">
+      </td>
+      <td id="tk-qty-e-${safeId}" style="display:none">
+        <input type="number" id="tk-qty-input-${safeId}" value="${x.qty}" min="0"
+          style="width:60px;padding:4px 8px;border:1.5px solid var(--teal);border-radius:5px">
+      </td>
+      <td id="tk-price-e-${safeId}" style="display:none">
+        <input type="number" id="tk-price-input-${safeId}" value="${x.price || 0}" min="0"
+          style="width:75px;padding:4px 8px;border:1.5px solid var(--teal);border-radius:5px"
+          oninput="liveUpdateTkSales('${safeId}')">
+      </td>
+      <td id="tk-markup-e-${safeId}" style="display:none">
+        <input type="number" id="tk-markup-input-${safeId}" value="${x.markup || 0}"
+          style="width:65px;padding:4px 8px;border:1.5px solid var(--teal);border-radius:5px"
+          oninput="liveUpdateTkSales('${safeId}')">
+      </td>
+      <td id="tk-sales-e-${safeId}" style="display:none;font-weight:700;color:var(--teal)" id="tk-sales-live-${safeId}">
+        ${salesPrice}
+      </td>
+      <!-- ACTION BUTTONS -->
+      <td style="white-space:nowrap">
+        <button class="btn-icon" id="tk-edit-btn-${safeId}"   onclick="startEditTackle('${safeId}')" title="Edit">✏️</button>
+        <button class="btn-icon" id="tk-save-btn-${safeId}"   onclick="saveEditTackle('${safeId}')"  title="Save"   style="display:none;color:var(--green)">💾</button>
+        <button class="btn-icon" id="tk-cancel-btn-${safeId}" onclick="cancelEditTackle('${safeId}')" title="Cancel" style="display:none">✕</button>
+        <button class="btn-icon" onclick="deleteTackleItem('${safeId}')" title="Delete">🗑️</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function startEditTackle(id) {
+  const fields = ['cat','desc','qty','price','markup','sales'];
+  fields.forEach(f => {
+    const d = document.getElementById(`tk-${f}-d-${id}`);
+    const e = document.getElementById(`tk-${f}-e-${id}`);
+    if (d) d.style.display = 'none';
+    if (e) e.style.display = '';
+  });
+  document.getElementById(`tk-edit-btn-${id}`).style.display   = 'none';
+  document.getElementById(`tk-save-btn-${id}`).style.display   = 'inline-block';
+  document.getElementById(`tk-cancel-btn-${id}`).style.display = 'inline-block';
+}
+
+function cancelEditTackle(id) {
+  const fields = ['cat','desc','qty','price','markup','sales'];
+  fields.forEach(f => {
+    const d = document.getElementById(`tk-${f}-d-${id}`);
+    const e = document.getElementById(`tk-${f}-e-${id}`);
+    if (d) d.style.display = '';
+    if (e) e.style.display = 'none';
+  });
+  document.getElementById(`tk-edit-btn-${id}`).style.display   = 'inline-block';
+  document.getElementById(`tk-save-btn-${id}`).style.display   = 'none';
+  document.getElementById(`tk-cancel-btn-${id}`).style.display = 'none';
+}
+
+function liveUpdateTkSales(id) {
+  const price  = parseFloat(document.getElementById(`tk-price-input-${id}`)?.value)  || 0;
+  const markup = parseFloat(document.getElementById(`tk-markup-input-${id}`)?.value) || 0;
+  const salesEl = document.getElementById(`tk-sales-e-${id}`);
+  if (salesEl) salesEl.textContent = calcSalesPrice(price, markup);
+}
+
+function saveEditTackle(id) {
+  const x = DB.tackle_items.find(t => t.id === id);
+  if (!x) return;
+  const newCat    = document.getElementById(`tk-cat-input-${id}`).value;
+  const newDesc   = document.getElementById(`tk-desc-input-${id}`).value.trim();
+  const newQty    = parseInt(document.getElementById(`tk-qty-input-${id}`).value)    || 0;
+  const newPrice  = parseFloat(document.getElementById(`tk-price-input-${id}`).value)  || 0;
+  const newMarkup = parseFloat(document.getElementById(`tk-markup-input-${id}`).value) || 0;
+  if (!newDesc) { showToast('Description cannot be empty', 'error'); return; }
+  x.cat    = newCat;
+  x.desc   = newDesc;
+  x.qty    = newQty;
+  x.price  = newPrice;
+  x.markup = newMarkup;
+  saveDB();
+  // Update display cells in place
+  document.getElementById(`tk-cat-d-${id}`).innerHTML    = `<span class="tag">${newCat}</span>`;
+  document.getElementById(`tk-desc-d-${id}`).textContent = newDesc;
+  document.getElementById(`tk-qty-d-${id}`).textContent  = newQty;
+  document.getElementById(`tk-price-d-${id}`).textContent = '₹' + newPrice;
+  document.getElementById(`tk-markup-d-${id}`).textContent = newMarkup + '%';
+  const sp = calcSalesPrice(newPrice, newMarkup);
+  document.getElementById(`tk-sales-d-${id}`).textContent = sp;
+  cancelEditTackle(id);
+  showToast(`✅ ${newDesc} saved — Sales price: ₹${sp}`, 'success');
+}
+
+function updateTackleFieldAdmin(id, field, val) {
+  // Kept for backwards compatibility — no longer used in table but may be called elsewhere
+  const x = DB.tackle_items.find(t => t.id === id);
+  if (!x) return;
+  if (field === 'qty')    x.qty    = parseInt(val)   || 0;
+  if (field === 'price')  x.price  = parseFloat(val) || 0;
+  if (field === 'markup') x.markup = parseFloat(val) || 0;
+  saveDB();
+}
+
+function addTackleItem() {
+  const cat    = document.getElementById('new-tk-cat').value;
+  const desc   = document.getElementById('new-tk-desc').value.trim();
+  const qty    = parseInt(document.getElementById('new-tk-qty').value)    || 0;
+  const price  = parseFloat(document.getElementById('new-tk-price').value)  || 0;
+  const markup = parseFloat(document.getElementById('new-tk-markup').value) || 0;
+  if (!desc) { showToast('Description is required', 'error'); return; }
+  const id = (cat + desc).replace(/[^a-zA-Z0-9]/g,'_').substring(0,30) + '_' + Date.now();
+  DB.tackle_items.push({ id, cat, desc, qty, price, markup });
+  saveDB(); renderAdminTackle();
+  document.getElementById('new-tk-desc').value   = '';
+  document.getElementById('new-tk-qty').value    = 0;
+  document.getElementById('new-tk-price').value  = 0;
+  document.getElementById('new-tk-markup').value = 0;
+  document.getElementById('new-tk-sales-preview').textContent = '0';
+  showToast(`✅ Added ${desc} — Sales price: ₹${calcSalesPrice(price, markup)}`, 'success');
+}
+
+function deleteTackleItem(id) {
+  if (!confirm('Delete this item?')) return;
+  DB.tackle_items = DB.tackle_items.filter(x => x.id !== id);
+  saveDB(); renderAdminTackle(); renderTackleList();
+  showToast('Item deleted', 'success');
+}
+
+// ═══════════════════════════════════════════
+// CSV / EXCEL IMPORT & EXPORT
+// ═══════════════════════════════════════════
+
+// ── Shared CSV parser ─────────────────────
+function parseCSV(text) {
+  const lines = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+  const result = [];
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+    const row = [];
+    let cur = '', inQ = false;
+    for (let j = 0; j < line.length; j++) {
+      const c = line[j];
+      if (c === '"') {
+        if (inQ && line[j + 1] === '"') { cur += '"'; j++; }
+        else inQ = !inQ;
+      } else if (c === ',' && !inQ) { row.push(cur); cur = ''; }
+      else cur += c;
+    }
+    row.push(cur);
+    result.push(row);
+  }
+  return result;
+}
+
+function csvCell(v) {
+  const s = (v === undefined || v === null) ? '' : String(v);
+  return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+}
+
+function downloadText(filename, text, mime) {
+  const blob = new Blob([text], { type: mime || 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+function readFileText(input, callback) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => { callback(e.target.result); input.value = ''; };
+  reader.readAsText(file);
+}
+
+// ── ASSETS ───────────────────────────────
+function exportAssetsCSV() {
+  const hdr = ['Name','Category','Purchase Date','Purchase Price','Removed Date','Reason'];
+  const rows = DB.boats.map(b => [b.name, b.category||'', b.purchaseDate||'', b.purchasePrice||'', b.removedDate||'', b.reason||'']);
+  const csv = [hdr, ...rows].map(r => r.map(csvCell).join(',')).join('\n');
+  downloadText(`GFA_Assets_${new Date().toISOString().split('T')[0]}.csv`, csv);
+  showToast('Assets CSV downloaded', 'success');
+}
+
+function exportAssetsXLSX() {
+  const wb = XLSX.utils.book_new();
+  const data = [
+    ['Name','Category','Purchase Date','Purchase Price','Removed Date','Reason'],
+    ...DB.boats.map(b => [b.name, b.category||'', b.purchaseDate||'', b.purchasePrice||'', b.removedDate||'', b.reason||''])
+  ];
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(data), 'Assets');
+  XLSX.writeFile(wb, `GFA_Assets_${new Date().toISOString().split('T')[0]}.xlsx`);
+  showToast('Assets Excel downloaded', 'success');
+}
+
+function importAssetsCSV(input) {
+  readFileText(input, text => {
+    const rows = parseCSV(text);
+    if (!rows.length) { showToast('Empty file', 'error'); return; }
+    // Expect header: Name, Category, Purchase Date, Purchase Price, Removed Date, Reason
+    const hdr = rows[0].map(h => h.trim().toLowerCase());
+    const iName = hdr.indexOf('name'), iCat = hdr.indexOf('category');
+    const iPDate = hdr.findIndex(h => h.includes('purchase date'));
+    const iPPrice = hdr.findIndex(h => h.includes('purchase price'));
+    const iRDate = hdr.findIndex(h => h.includes('removed date'));
+    const iReason = hdr.indexOf('reason');
+    if (iName < 0) { showToast('CSV must have a "Name" column', 'error'); return; }
+    let added = 0, updated = 0;
+    for (let i = 1; i < rows.length; i++) {
+      const r = rows[i];
+      const name = (r[iName] || '').trim();
+      if (!name) continue;
+      const existing = DB.boats.find(b => b.name.toLowerCase() === name.toLowerCase());
+      const obj = {
+        name,
+        category:      iCat    >= 0 ? (r[iCat]    || '').trim() : '',
+        purchaseDate:  iPDate  >= 0 ? (r[iPDate]  || '').trim() : '',
+        purchasePrice: iPPrice >= 0 ? (r[iPPrice] || '') : '',
+        removedDate:   iRDate  >= 0 ? (r[iRDate]  || '').trim() : '',
+        reason:        iReason >= 0 ? (r[iReason] || '').trim() : ''
+      };
+      if (existing) { Object.assign(existing, obj); updated++; }
+      else { DB.boats.push(obj); added++; }
+    }
+    saveDB(); renderAdminAssets();
+    showToast(`✅ Assets import done — ${added} added, ${updated} updated`, 'success');
+  });
+}
+
+// ── SPARE PARTS ───────────────────────────
+function exportPartsCSV() {
+  const hdr = ['Part Number','Category','Unit','Balance'];
+  const rows = DB.parts.map(p => [p.pn, p.boat||'', p.unit||'', p.balance||0]);
+  const csv = [hdr, ...rows].map(r => r.map(csvCell).join(',')).join('\n');
+  downloadText(`GFA_SpareParts_${new Date().toISOString().split('T')[0]}.csv`, csv);
+  showToast('Spare Parts CSV downloaded', 'success');
+}
+
+function exportPartsXLSX() {
+  const wb = XLSX.utils.book_new();
+  const data = [
+    ['Part Number','Category','Unit','Balance'],
+    ...DB.parts.map(p => [p.pn, p.boat||'', p.unit||'', p.balance||0])
+  ];
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(data), 'Spare Parts');
+  XLSX.writeFile(wb, `GFA_SpareParts_${new Date().toISOString().split('T')[0]}.xlsx`);
+  showToast('Spare Parts Excel downloaded', 'success');
+}
+
+function importPartsCSV(input) {
+  readFileText(input, text => {
+    const rows = parseCSV(text);
+    if (!rows.length) { showToast('Empty file', 'error'); return; }
+    const hdr = rows[0].map(h => h.trim().toLowerCase());
+    const iPN = hdr.findIndex(h => h.includes('part number') || h === 'pn');
+    const iCat = hdr.findIndex(h => h === 'category' || h.includes('boat'));
+    const iUnit = hdr.indexOf('unit');
+    const iBal = hdr.indexOf('balance');
+    if (iPN < 0) { showToast('CSV must have a "Part Number" column', 'error'); return; }
+    let added = 0, updated = 0;
+    for (let i = 1; i < rows.length; i++) {
+      const r = rows[i];
+      const pn = (r[iPN] || '').trim();
+      if (!pn) continue;
+      const existing = DB.parts.find(p => p.pn.toLowerCase() === pn.toLowerCase());
+      const obj = {
+        id: pn, pn,
+        boat:    iCat  >= 0 ? (r[iCat]  || '').trim() : '',
+        unit:    iUnit >= 0 ? (r[iUnit] || 'PCS').trim() : 'PCS',
+        balance: iBal  >= 0 ? (parseInt(r[iBal]) || 0) : 0
+      };
+      if (existing) { Object.assign(existing, obj); updated++; }
+      else { DB.parts.push(obj); added++; }
+    }
+    saveDB(); renderAdminParts(); updateHomeCounts();
+    showToast(`✅ Spare Parts import done — ${added} added, ${updated} updated`, 'success');
+  });
+}
+
+// ── GUEST HOUSE ───────────────────────────
+function exportGHCSV() {
+  const hdr = ['Category','Item Name','Qty','Price (Rs)'];
+  const rows = [];
+  Object.entries(DB.ghCategories).forEach(([cat, items]) => {
+    items.forEach(it => rows.push([cat, it.name, it.qty||0, it.price||0]));
+  });
+  const csv = [hdr, ...rows].map(r => r.map(csvCell).join(',')).join('\n');
+  downloadText(`GFA_GuestHouse_${new Date().toISOString().split('T')[0]}.csv`, csv);
+  showToast('Guest House CSV downloaded', 'success');
+}
+
+function exportGHXLSX() {
+  const wb = XLSX.utils.book_new();
+  Object.entries(DB.ghCategories).forEach(([cat, items]) => {
+    const data = [
+      ['Item Name','Qty','Price (Rs)'],
+      ...items.map(it => [it.name, it.qty||0, it.price||0])
+    ];
+    const sheetName = cat.replace(/[\\/:*?[\]]/g, '').substring(0, 31);
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(data), sheetName);
+  });
+  // Also create an "All Items" sheet
+  const allData = [['Category','Item Name','Qty','Price (Rs)']];
+  Object.entries(DB.ghCategories).forEach(([cat, items]) =>
+    items.forEach(it => allData.push([cat, it.name, it.qty||0, it.price||0]))
+  );
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(allData), 'All Items');
+  XLSX.writeFile(wb, `GFA_GuestHouse_${new Date().toISOString().split('T')[0]}.xlsx`);
+  showToast('Guest House Excel downloaded', 'success');
+}
+
+function importGHCSV(input) {
+  readFileText(input, text => {
+    const rows = parseCSV(text);
+    if (!rows.length) { showToast('Empty file', 'error'); return; }
+    const hdr = rows[0].map(h => h.trim().toLowerCase());
+    const iCat  = hdr.findIndex(h => h === 'category');
+    const iName = hdr.findIndex(h => h === 'item name' || h === 'name');
+    const iQty  = hdr.findIndex(h => h === 'qty' || h === 'quantity');
+    const iPrice= hdr.findIndex(h => h.includes('price'));
+    if (iName < 0) { showToast('CSV must have an "Item Name" column', 'error'); return; }
+    let added = 0, updated = 0;
+    for (let i = 1; i < rows.length; i++) {
+      const r = rows[i];
+      const name = (r[iName] || '').trim().toUpperCase();
+      const cat  = iCat >= 0 ? (r[iCat] || '').trim() : '';
+      if (!name) continue;
+      // Find matching category
+      const catKey = Object.keys(DB.ghCategories).find(k => k.toLowerCase() === cat.toLowerCase()) || cat;
+      if (!DB.ghCategories[catKey]) DB.ghCategories[catKey] = [];
+      const existing = DB.ghCategories[catKey].find(it => it.name === name);
+      if (existing) {
+        if (iQty   >= 0) existing.qty   = parseInt(r[iQty])   || 0;
+        if (iPrice >= 0) existing.price = parseFloat(r[iPrice]) || 0;
+        updated++;
+      } else {
+        DB.ghCategories[catKey].push({
+          id: Date.now() + Math.random(),
+          name,
+          qty:   iQty   >= 0 ? (parseInt(r[iQty])    || 0) : 0,
+          price: iPrice >= 0 ? (parseFloat(r[iPrice]) || 0) : 0
+        });
+        added++;
+      }
+    }
+    saveDB(); switchAdminGHTab(Object.keys(DB.ghCategories)[0] || 'Linen'); updateHomeCounts();
+    showToast(`✅ Guest House import done — ${added} added, ${updated} updated`, 'success');
+  });
+}
+
+// ── TACKLE ────────────────────────────────
+function exportTackleCSV() {
+  const hdr = ['Category','Description','Qty','Purchase Price (Rs)','Markup %','Sales Price (Rs)'];
+  const rows = DB.tackle_items.map(x => {
+    const sp = Math.round((x.price || 0) * (1 + (x.markup || 0) / 100));
+    return [x.cat, x.desc, x.qty||0, x.price||0, x.markup||0, sp];
+  });
+  const csv = [hdr, ...rows].map(r => r.map(csvCell).join(',')).join('\n');
+  downloadText(`GFA_Tackle_${new Date().toISOString().split('T')[0]}.csv`, csv);
+  showToast('Tackle CSV downloaded', 'success');
+}
+
+function exportTackleXLSX() {
+  const wb = XLSX.utils.book_new();
+  const data = [
+    ['Category','Description','Qty','Purchase Price (Rs)','Markup %','Sales Price (Rs)'],
+    ...DB.tackle_items.map(x => {
+      const sp = Math.round((x.price || 0) * (1 + (x.markup || 0) / 100));
+      return [x.cat, x.desc, x.qty||0, x.price||0, x.markup||0, sp];
+    })
+  ];
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(data), 'Tackle');
+  XLSX.writeFile(wb, `GFA_Tackle_${new Date().toISOString().split('T')[0]}.xlsx`);
+  showToast('Tackle Excel downloaded', 'success');
+}
+
+function importTackleCSV(input) {
+  readFileText(input, text => {
+    const rows = parseCSV(text);
+    if (!rows.length) { showToast('Empty file', 'error'); return; }
+    const hdr = rows[0].map(h => h.trim().toLowerCase());
+    const iCat   = hdr.findIndex(h => h === 'category');
+    const iDesc  = hdr.findIndex(h => h === 'description' || h === 'desc');
+    const iQty   = hdr.findIndex(h => h === 'qty' || h === 'quantity');
+    const iPrice = hdr.findIndex(h => h.includes('purchase price') || h === 'price');
+    const iMarkup= hdr.findIndex(h => h.includes('markup'));
+    if (iDesc < 0) { showToast('CSV must have a "Description" column', 'error'); return; }
+    let added = 0, updated = 0;
+    for (let i = 1; i < rows.length; i++) {
+      const r = rows[i];
+      const desc = (r[iDesc] || '').trim();
+      const cat  = iCat >= 0 ? (r[iCat] || '').trim() : '';
+      if (!desc) continue;
+      const existing = DB.tackle_items.find(x =>
+        x.desc.toLowerCase() === desc.toLowerCase() && x.cat.toLowerCase() === cat.toLowerCase()
+      );
+      if (existing) {
+        if (iQty    >= 0) existing.qty    = parseInt(r[iQty])     || 0;
+        if (iPrice  >= 0) existing.price  = parseFloat(r[iPrice]) || 0;
+        if (iMarkup >= 0) existing.markup = parseFloat(r[iMarkup])|| 0;
+        updated++;
+      } else {
+        // Also add new category if not present
+        if (cat && !DB.tackle_cats.includes(cat)) DB.tackle_cats.push(cat);
+        DB.tackle_items.push({
+          id:     Date.now() + Math.random(),
+          cat,
+          desc,
+          qty:    iQty    >= 0 ? (parseInt(r[iQty])     || 0) : 0,
+          price:  iPrice  >= 0 ? (parseFloat(r[iPrice]) || 0) : 0,
+          markup: iMarkup >= 0 ? (parseFloat(r[iMarkup])|| 0) : 0
+        });
+        added++;
+      }
+    }
+    saveDB(); renderAdminTackle(); populateTackleSelects(); renderTackleList(); updateHomeCounts();
+    showToast(`✅ Tackle import done — ${added} added, ${updated} updated`, 'success');
+  });
+}
+
+// ═══════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════
+function changePassword() {
+  const cur  = document.getElementById('pw-current').value;
+  const nw   = document.getElementById('pw-new').value;
+  const conf = document.getElementById('pw-confirm').value;
+  if (!nw || nw.length < 4) { showToast('New password must be at least 4 characters', 'error'); return; }
+  if (nw !== conf) { showToast('New passwords do not match', 'error'); return; }
+
+  if (currentUser && currentUser.role === 'superadmin') {
+    if (cur !== DB.superAdminPw) { showToast('Current password is incorrect', 'error'); return; }
+    DB.superAdminPw = nw;
+  } else if (currentUser && currentUser.role === 'admin') {
+    const acc = (DB.admins || []).find(a => a.name === currentUser.name);
+    if (!acc) { showToast('Admin account not found', 'error'); return; }
+    if (cur !== acc.password) { showToast('Current password is incorrect', 'error'); return; }
+    acc.password = nw;
+  } else {
+    showToast('Cannot change password for this role', 'error'); return;
+  }
+  saveDB();
+  document.getElementById('pw-current').value = '';
+  document.getElementById('pw-new').value = '';
+  document.getElementById('pw-confirm').value = '';
+  showToast('✅ Password updated successfully', 'success');
+}
+
+function confirmReset() {
+  if (currentUser?.role !== 'superadmin') { showToast('Only Super Admin can reset data', 'error'); return; }
+  if (!confirm('This will reset ALL inventory data to the original snapshot.\nAll updates will be lost.\nStaff and admin accounts will be preserved.\nAre you sure?')) return;
+  DB = {
+    boats:        SEED.boats.map(b => ({ name: b, category: 'Boat & Fishing Equipment' })),
+    staffUsers:   DB.staffUsers || [],
+    admins:       DB.admins || [],
+    superAdminPw: DB.superAdminPw || 'GFASUPER2026',
+    adminPw:      DB.adminPw || 'GFA2026',
+    parts:        SEED.parts.map(p => ({...p})),
+    ghCategories: JSON.parse(JSON.stringify(GH_SEED)),
+    tackle_cats:  [...SEED.tackle_cats],
+    tackle_items: SEED.tackle_items.map(x => ({...x})),
+    updates:      []
+  };
+  saveDB(); renderAdminAll(); updateHomeCounts(); renderGHCategory();
+  showToast('Data reset to original snapshot', 'success');
+}
+
+function exportCSV() {
+  let csv = 'Timestamp,Category,Details\n';
+  DB.updates.forEach(u => {
+    let detail = '';
+    if (u.category==='maintenance') detail = `${u.asset}|${u.desc}|${u.status}|${u.date}|Port:${u.port||''}|Stbd:${u.stbd||''}|${u.remarks||''}`;
+    else if (u.category==='spareparts') detail = `${u.pn}|${u.action}|qty:${u.qty}|balance:${u.balance_after}|${u.remarks||''}`;
+    else if (u.category==='guesthouse') detail = `${u.subtype}|${u.item}|${u.old_qty}→${u.new_qty}`;
+    else if (u.category==='tackle') detail = `${u.cat}|${u.desc}|${u.old_qty}→${u.new_qty}`;
+    const safeDetail = detail.replace(/"/g, "'");
+    csv += '"' + u.ts + '","' + u.category + '","' + safeDetail + '"\n';
+  });
+  const blob = new Blob([csv], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `GFA_Updates_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  showToast('CSV downloaded', 'success');
+}
+
+// ═══════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════
+let toastTimer;
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (type ? ' ' + type : '');
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('maint-date').value = new Date().toISOString().split('T')[0];
+
+  // ── Register PWA service worker ───────────────────────────
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+
+  function initApp(json) {
+    loadDB(json);
+    document.getElementById('loading-overlay').style.display = 'none';
+    populateStaffLoginDropdown();
+    document.getElementById('login-overlay').classList.remove('hidden');
+  }
+
+  function showLoadError(msg) {
+    document.getElementById('loading-overlay').innerHTML =
+      `<div style="padding:30px;max-width:320px">
+        <div style="font-size:44px;margin-bottom:16px">⚠️</div>
+        <div style="font-size:17px;font-weight:700;margin-bottom:8px">Failed to Load Data</div>
+        <div style="font-size:13px;opacity:.8;margin-bottom:20px">${msg || 'Connection error. Please check your internet connection.'}</div>
+        <button onclick="location.reload()"
+          style="padding:12px 28px;background:#D4A017;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer">
+          🔄 Retry
+        </button>
+      </div>`;
+  }
+
+  if (API_URL) {
+    // PWA mode — load from Apps Script REST API via fetch()
+    fetch(API_URL + '?action=getData')
+      .then(r => r.json())
+      .then(res => {
+        if (res.success) { initApp(res.data); }
+        else { showLoadError(res.error || 'API returned an error.'); }
+      })
+      .catch(err => showLoadError('Network error: ' + err.message));
+  } else if (typeof google !== 'undefined' && google.script) {
+    // Legacy Apps Script web-app mode
+    google.script.run
+      .withSuccessHandler(initApp)
+      .withFailureHandler(err => showLoadError(err.message))
+      .getData();
+  } else {
+    // Local file / dev fallback
+    initApp(localStorage.getItem('gfa_inventory_db'));
+  }
+});
+</script>
+</body>
+</html>

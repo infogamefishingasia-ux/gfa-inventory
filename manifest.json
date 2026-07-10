@@ -1,0 +1,31 @@
+{
+  "name": "GFA Inventory",
+  "short_name": "GFA",
+  "description": "GFA / Aqua Creed Inventory Management System",
+  "start_url": "/gfa-inventory/",
+  "scope": "/gfa-inventory/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#1B3A5C",
+  "background_color": "#FFFFFF",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
